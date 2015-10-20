@@ -1,8 +1,8 @@
 {
     "name":             "reconfigure",
-    "version":          "9.9.9",
+    "version":          "0.0.0",
     "author":           "Alan Gutierrez <alan@prettyrobots.com>",
-    "description":      "A micro-framework for HTTP end points.",
+    "description":      "Consensus driven application configuration.",
     "keywords":
     [
                         "etcd", "consensus", "configuration", "coreos"
