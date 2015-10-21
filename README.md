@@ -2,4 +2,4 @@
 
 A reconfiguration service for CoreOS applications.
 
-`$ bash launch 4` starts a cluster of 4.
+`$ bash launch 3` starts a cluster of 3.
