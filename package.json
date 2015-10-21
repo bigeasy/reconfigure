@@ -25,7 +25,8 @@
                         "inlet":                "0.2.6",
                         "prolific":             "0.0.6",
                         "magazine":             "0.0.14",
-                        "vizsla":               "0.0.6"
+                        "vizsla":               "0.0.6",
+                        "node-etcd":            "*"
     },
     "devDependencies":
     {
