@@ -21,15 +21,15 @@ function prove (async, assert) {
              -initial-cluster-token etcd-cluster-1 \
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
-    }, function (container) {
+    }, function () {
         wrap.initialize(async())
     }, function () {
-        wrap.mkdir('/test', async())
+        wrap.initialize(async())
     }, function () {
-        wrap.set('/test/blegh', 'haha', async())
+        wrap.set('test/blegh', 'haha', async())
     }, function (set) {
         assert(set.node.key, '/reconfigure/test/blegh', 'key set')
-        wrap.get('/test/blegh', async())
+        wrap.get('test/blegh', async())
     }, function (key) {
         assert(key.node.value, 'haha', 'retrieved monitored value')
     })

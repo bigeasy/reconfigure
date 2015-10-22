@@ -6,33 +6,25 @@ function Wrapper (host, port) {
 }
 
 Wrapper.prototype.initialize = cadence(function (async) {
-    this.mkdir('', async())
+    async([function () {
+        this._etcd.mkdir('/reconfigure', async())
+    }, /^Not a file$/, function (error) {
+        //already initialized
+    }])
 })
 
 Wrapper.prototype.set = cadence(function (async, key, val) {
 // flat hierarchy so `val` should always be
-    this._etcd.set('/reconfigure' + key, val, async())
+    this._etcd.set('/reconfigure/' + key, val, async())
 })
 
 Wrapper.prototype.get = cadence(function (async, key) {
 // key will probably just be '/'
-  this._etcd.get('/reconfigure' + key, async())
+  this._etcd.get('/reconfigure/' + key, async())
 })
 
-Wrapper.prototype.mkdir = cadence(function (async, dir) {
-    this._etcd.mkdir('/reconfigure' + dir, async())
+Wrapper.prototype.watch = cadence(function (async, key) {
+    this._etcd.watch(key, async())
 })
-
-Wrapper.prototype.rmdir = cadence(function (async, dir) {
-    this._etcd.rmdir('/reconfigure' + dir, async())
-})
-
-/*
-Wrapper.prototype.watch = function (key, callback) {
-    var watch = this._etcd.watcher(key)
-    watch.on('change', callback)
-    return watch
-}
-*/
 
 module.exports = Wrapper
