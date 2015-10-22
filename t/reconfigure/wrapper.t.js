@@ -26,12 +26,10 @@ function prove (async, assert) {
     }, function () {
         wrap.initialize(async())
     }, function () {
-        wrap.mkdir('/test', async())
-    }, function () {
-        wrap.set('/test/blegh', 'haha', async())
+        wrap.set('test/blegh', 'haha', async())
     }, function (set) {
         assert(set.node.key, '/reconfigure/test/blegh', 'key set')
-        wrap.get('/test/blegh', async())
+        wrap.get('test/blegh', async())
     }, function (key) {
         assert(key.node.value, 'haha', 'retrieved monitored value')
     })
