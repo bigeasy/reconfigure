@@ -2,16 +2,16 @@ require('proof')(2, require('cadence')(prove))
 function prove (async, assert) {
     var wrapper = require('../../reconfigure/wrapper')
     var exec = require('child_process').exec
-    var ip = '0.0.0.0' // /[^0-9]*\([0-9.]*\).*/\1/.exec(process.env.DOCKER_HOST) << doesn't work
+    var ip = /^[^\d]+([\d.]+)/.exec(process.env.DOCKER_HOST)[1]
     var wrap = new wrapper(ip, '2379')
-    async([
+    async([function () {
         async(function () {
             exec('docker kill reconfigure-etcd', async())
         }, function () {
             exec('docker rm reconfigure-etcd', async())
         })
-    ], function () {
-        exec('docker run --rm -p 4001:4001 -p 2380:2380 -p 2379:2379 \
+    }], function () {
+        exec('docker run -d -p 4001:4001 -p 2380:2380 -p 2379:2379 \
              --name reconfigure-etcd quay.io/coreos/etcd \
              -name reconfigure-etcd \
              -advertise-client-urls http://' + ip + ':2379,http://' + ip + ':4001 \
@@ -19,10 +19,9 @@ function prove (async, assert) {
              -initial-advertise-peer-urls http://' + ip + ':2380 \
              -listen-peer-urls http://0.0.0.0:2380 \
              -initial-cluster-token etcd-cluster-1 \
-             -initial-cluster etcd0=http://' + ip + ':2380 \
+             -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
-    }, function () {
-        console.log(arguments)
+    }, function (container) {
         wrap.initialize(async())
     }, function () {
         wrap.mkdir('/test', async())
@@ -35,7 +34,3 @@ function prove (async, assert) {
         assert(key.node.value, 'haha', 'retrieved monitored value')
     })
 }
-/*
-function () {console.log(arguments)})
-function () {console.log(arguments)})
-*/
