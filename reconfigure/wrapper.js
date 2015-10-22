@@ -8,7 +8,7 @@ function Wrapper (host, port) {
 Wrapper.prototype.initialize = cadence(function (async) {
     async([function () {
         this._etcd.mkdir('/reconfigure', async())
-    }, /Not a file/, function (error) {
+    }, /^Not a file$/, function (error) {
         //already initialized
     }])
 })
