@@ -26,8 +26,7 @@
                         "prolific":             "0.0.6",
                         "magazine":             "0.0.14",
                         "vizsla":               "0.0.6",
-                        "node-etcd":            "*",
-                        "node-uuid":            "*"
+                        "node-etcd":            "*"
     },
     "devDependencies":
     {
