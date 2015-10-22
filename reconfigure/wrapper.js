@@ -6,7 +6,11 @@ function Wrapper (host, port) {
 }
 
 Wrapper.prototype.initialize = cadence(function (async) {
-    this.mkdir('', async())
+    async([function () {
+        this.mkdir('', async())
+    }, /Not a file/, function (error) {
+        //already initialized
+    }])
 })
 
 Wrapper.prototype.set = cadence(function (async, key, val) {

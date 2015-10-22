@@ -21,7 +21,9 @@ function prove (async, assert) {
              -initial-cluster-token etcd-cluster-1 \
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
-    }, function (container) {
+    }, function () {
+        wrap.initialize(async())
+    }, function () {
         wrap.initialize(async())
     }, function () {
         wrap.mkdir('/test', async())
