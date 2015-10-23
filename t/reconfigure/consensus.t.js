@@ -32,13 +32,8 @@ function prove (async, assert) {
         consensus.get('test/blegh', async())
     }, function (key) {
         assert(key.node.value, 'haha', 'retrieved monitored value')
-        consensus.watch('test/blegh', async())
-        async(function () {
-            setTimeout(async(), 2500)
-        }, function () {
-            consensus.set('test/blegh', 'hahhah', async())
-        })
-    }, function (watch) {
-        assert(watch.node.value, 'hahhah', 'key watched')
+    }, function () {
+        consensus.watch(async())
+        consensus.stop()
     })
 }
