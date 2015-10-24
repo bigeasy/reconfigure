@@ -38,7 +38,7 @@ Consensus.prototype.get = cadence(function (async, key) {
 
 Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
     async(function () {
-        this._list('/reconfigure', async()) // <- error -> panic!
+        //this._list('/reconfigure', async()) // <- error -> panic!
     }, function (object) {
         this._listener(object, async()) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
@@ -52,7 +52,6 @@ Consensus.prototype.watch = cadence(function (async) {
     this._watcher = this._etcd.watcher('/reconfigure', null, { recursive: true })
     new Delta(async()).ee(this._watcher).on('change', function (whatIsThis) {
         // ^^^ change
-        console.log(arguments)
         this._changed(abend)
     }.bind(this)).on('stop')
 })
