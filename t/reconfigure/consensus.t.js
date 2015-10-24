@@ -9,7 +9,7 @@ function prove (async, assert) {
         console.log(require('os').networkInterfaces())
         ip = require('os').networkInterfaces().eth0.filter(function (iface) {
             return iface.family == 'IPv4'
-        }).address
+        })[0].address
     }
     console.log(ip)
     var consensus = new Consensus(ip, '2379')
