@@ -13,8 +13,7 @@ function Consensus (host, port, listener) {
 
 Consensus.prototype.stop = function () {
     if (this._watcher != null) {
-        this._watcher.stop()
-        console.log('stopped')
+        return this._watcher.stop()
     }
 }
 
@@ -52,7 +51,6 @@ Consensus.prototype.watch = cadence(function (async) {
     this._watcher = this._etcd.watcher('/reconfigure', null, { recursive: true })
     new Delta(async()).ee(this._watcher).on('change', function (whatIsThis) {
         // ^^^ change
-        console.log(arguments)
         this._changed(abend)
     }.bind(this)).on('stop')
 })
