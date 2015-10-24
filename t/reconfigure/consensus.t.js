@@ -2,7 +2,15 @@ require('proof')(2, require('cadence')(prove))
 function prove (async, assert) {
     var Consensus = require('../../reconfigure/consensus')
     var exec = require('child_process').exec
-    var ip = /^[^\d]+([\d.]+)/.exec(process.env.DOCKER_HOST)[1]
+    var ip
+    if (process.env.DOCKER_HOST) {
+        ip = /^[^\d]+([\d.]+)/.exec(process.env.DOCKER_HOST)[1]
+    } else {
+        ip = require('os').networkInterfaces().docker0.filter(function (iface) {
+            return iface.family == 'IPv4'
+        }).address
+    }
+    console.log(ip)
     var consensus = new Consensus(ip, '2379')
     async([function () {
         async(function () {
