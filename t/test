@@ -4,8 +4,6 @@ set -e
 
 echo ""
 
-node t/reconfigure/consensus.t.js
-
 (proof run t/*/*.t.js | tee .proof.out | proof progress) || (proof errors < .proof.out) || exit 1
 
 if [ "$TRAVIS" = "true" ]; then
