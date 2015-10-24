@@ -37,7 +37,7 @@ Consensus.prototype.get = cadence(function (async, key) {
 
 Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
     async(function () {
-        this._list('/reconfigure', async()) // <- error -> panic!
+        //this._list('/reconfigure', async()) // <- error -> panic!
     }, function (object) {
         this._listener(object, async()) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
