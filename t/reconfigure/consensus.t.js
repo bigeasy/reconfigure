@@ -6,6 +6,7 @@ function prove (async, assert) {
     if (process.env.DOCKER_HOST) {
         ip = /^[^\d]+([\d.]+)/.exec(process.env.DOCKER_HOST)[1]
     } else {
+        console.log(require('os').networkInterfaces())
         ip = require('os').networkInterfaces().docker0.filter(function (iface) {
             return iface.family == 'IPv4'
         }).address
