@@ -1,4 +1,4 @@
-require('proof')(2, require('cadence')(prove))
+require('proof')(3, require('cadence')(prove))
 function prove (async, assert) {
     var Consensus = require('../../reconfigure/consensus')
     var exec = require('child_process').exec
@@ -12,7 +12,6 @@ function prove (async, assert) {
         })[0].address
     }
     console.log(ip)
-    var consensus = new Consensus(ip, '2379')
     async([function () {
         async(function () {
             exec('docker kill reconfigure-etcd', async())
@@ -31,18 +30,27 @@ function prove (async, assert) {
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
     }, function () {
-        consensus.initialize(async())
-    }, function () {
-        consensus.initialize(async())
-    }, function () {
-        consensus.set('test/blegh', 'haha', async())
-    }, function (set) {
-        assert(set.node.key, '/reconfigure/test/blegh', 'key set')
-        consensus.get('test/blegh', async())
-    }, function (key) {
-        assert(key.node.value, 'haha', 'retrieved monitored value')
-    }, function () {
-        consensus.watch(async())
-        consensus.stop()
+        var consensus = new Consensus(ip, '2379', async())
+        async(function () {
+            consensus.initialize(async())
+        }, function () {
+            consensus.initialize(async())
+        }, function () {
+            consensus.set('foo', 'bar', async())
+            consensus.set('fro', 'bar', async())
+            consensus.set('frr', 'bar', async())
+            consensus.set('for', 'bar', async())
+        }, function (set) {
+            assert(set.node.key, '/reconfigure/foo', 'key set')
+            consensus.get('for', async())
+        }, function (key) {
+            assert(key.node.value, 'bar', 'retrieved monitored value')
+        }, function () {
+            async(function () {
+                consensus.list(async())
+            }, function (list) {
+                assert.deepEqual(list, {'foo':'bar','fro':'bar','frr':'bar','for':'bar'}, 'list ok')
+            })
+        })
     })
 }
