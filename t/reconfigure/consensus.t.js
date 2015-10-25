@@ -50,7 +50,17 @@ function prove (async, assert) {
                 consensus.list(async())
             }, function (list) {
                 assert.deepEqual(list, {'foo':'bar','fro':'bar','frr':'bar','for':'bar'}, 'list ok')
+            }, function () {
+                consensus.watch(async())
+                consensus.set('foo', 'blat', async())
+                consensus.stop()
+            }, function (list) {
+                assert.notDeepEqual(list,
+                {'foo':'bar','fro':'bar','frr':'bar','for':'bar'}, 'list updated')
             })
         })
+    }, function () {
+        // vvv not called
+        assert(arguments, arguments, 'listener called')
     })
 }
