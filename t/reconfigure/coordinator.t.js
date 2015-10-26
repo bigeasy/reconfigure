@@ -2,7 +2,6 @@ require('proof')(3, require('cadence')(prove))
 
 function prove (async, assert) {
     var Coordinator = require('../../reconfigure/coordinator')
-    var Consensus = require('../../reconfigure/consensus')
     var con = {
         listeners: [],
         initialize: function (callback) {
