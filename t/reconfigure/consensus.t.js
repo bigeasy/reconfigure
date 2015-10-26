@@ -46,7 +46,7 @@ function prove (async, assert) {
             consensus.set('frr', 'bar', async())
             consensus.set('for', 'bar', async())
         }, function (set) {
-            assert(set.node.key, '/reconfigure/foo', 'key set')
+            assert(set.node.key, '/reconfigure/properties/foo', 'key set')
         }, function () {
             async(function () {
                 consensus.list(async())
