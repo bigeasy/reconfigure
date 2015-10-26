@@ -3,11 +3,12 @@ var cadence = require('cadence')
 var Delta = require('delta')
 var turnstile = require('turnstile')
 var abend = require('abend')
+var Operation = require('operation')
 
 function Consensus (host, port, listener) {
     this._etcd = new Etcd(host, port)
     this._watcher = null
-    this._listener = listener // <- asynchronous function, if we get an error we panic.
+    this._listener = new Operation(listener) // <- asynchronous function, if we get an error we panic.
     this._turnstile = new turnstile.Turnstile
 }
 
@@ -47,7 +48,7 @@ Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
         this.list('/reconfigure', async()) // <- error -> panic!
             // ^^^ bulky, but necessary because race conditions.
     }, function (object) {
-        (this._listener)(object, async()) // <- error -> panic!
+        this._listener.apply([ object, async() ]) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
         // up in the next tick queue?
         // ^^^ should, we don't know how, use Cadence exceptions to do the right
