@@ -28,7 +28,7 @@
                         "abend":                "0.0.1",
                         "vizsla":               "0.0.6",
                         "semblance":            "0.0.4",
-                        "node-etcd":            "*"
+                        "node-etcd":            "4.2.1"
     },
     "devDependencies":
     {
