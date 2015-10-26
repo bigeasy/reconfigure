@@ -9,7 +9,6 @@ function Consensus (host, port, listener) {
     this._watcher = null
     this._listener = listener // <- asynchronous function, if we get an error we panic.
     this._turnstile = new turnstile.Turnstile
-//    this._list = {}
 }
 
 Consensus.prototype.stop = function () {
@@ -29,13 +28,6 @@ Consensus.prototype.initialize = cadence(function (async) {
 Consensus.prototype.set = cadence(function (async, key, val) {
 // flat hierarchy so `val` should always be
     this._etcd.set('/reconfigure/' + key, val, async())
-//    this._list.key = val
-})
-
-// vvv Unused
-Consensus.prototype.get = cadence(function (async, key) {
-// key will probably just be '/'
-  this._etcd.get('/reconfigure/' + key, async())
 })
 
 Consensus.prototype.list = cadence(function (async) {
@@ -53,7 +45,7 @@ Consensus.prototype.list = cadence(function (async) {
 Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
     async(function () {
         this.list('/reconfigure', async()) // <- error -> panic!
-            // ^^^ bluky, but necessary because race conditions.
+            // ^^^ bulky, but necessary because race conditions.
     }, function (object) {
         (this._listener)(object, async()) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
