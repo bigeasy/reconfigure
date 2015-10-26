@@ -1,4 +1,4 @@
-require('proof')(5, require('cadence')(prove))
+require('proof')(6, require('cadence')(prove))
 function prove (async, assert) {
     var Consensus = require('../../reconfigure/consensus')
     var exec = require('child_process').exec
@@ -46,6 +46,12 @@ function prove (async, assert) {
             consensus.listeners(async())
         }, function (list) {
             assert(list, ['http://127.0.0.1:9998'], 'listener added')
+        }, function () {
+            consensus.addListener('http://127.0.0.1:9998', async())
+        }, function () {
+            consensus.listeners(async())
+        }, function (list) {
+            assert(list, ['http://127.0.0.1:9998'], 'duplicate prevented')
         }, function () {
             consensus.removeListener('http://127.0.0.1:9998', async())
         }, function () {
