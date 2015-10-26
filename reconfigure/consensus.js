@@ -27,18 +27,33 @@ Consensus.prototype.stop = function () {
 }
 
 Consensus.prototype.addListener = cadence(function (async, url) {
-    this._etcd.set('/reconfigure/listeners/' + url.replace(/\W/g, ''), url, async())
+    this._etcd.set('/reconfigure/listeners/' + Date.now(), url, async())
 })
 
 Consensus.prototype.removeListener = cadence(function (async, url) {
-    this._etcd.del('/reconfigure/listeners/' + url.replace(/\W/g, ''), async())
-})
-
-Consensus.prototype.listeners = cadence(function (async) {
-    var ret = []
     async(function () {
         this._etcd.get('/reconfigure/listeners', async())
     }, function (list) {
+        var keys = []
+        for (var i in list.node.nodes) {
+            if (list.node.nodes[i].value == url) {
+                keys.push(list.node.nodes[i].key) // don't break in case of dupes
+            }
+        }
+        return [keys]
+    }, function (keys) {
+        async.forEach(function (key) {
+            console.log(key)
+            this._etcd.del(key, async())
+        })(keys)
+    })
+})
+
+Consensus.prototype.listeners = cadence(function (async) {
+    async(function () {
+        this._etcd.get('/reconfigure/listeners', async())
+    }, function (list) {
+        var ret = []
         for (var i in list.node.nodes) {
             ret.push(list.node.nodes[i].value)
         }
