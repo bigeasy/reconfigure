@@ -20,7 +20,7 @@ Consensus.prototype.stop = function () {
 
 Consensus.prototype.initialize = cadence(function (async) {
     async([function () {
-        this._etcd.mkdir('/reconfigure', async())
+        this._etcd.mkdir('/reconfigure/properties', async())
     }, /^Not a file$/, function (error) {
         //already initialized
     }])
@@ -28,16 +28,16 @@ Consensus.prototype.initialize = cadence(function (async) {
 
 Consensus.prototype.set = cadence(function (async, key, val) {
 // flat hierarchy so `val` should always be
-    this._etcd.set('/reconfigure/' + key, val, async())
+    this._etcd.set('/reconfigure/properties/' + key, val, async())
 })
 
 Consensus.prototype.list = cadence(function (async) {
     var list = {}
     async(function () {
-        this._etcd.get('/reconfigure', async())
+        this._etcd.get('/reconfigure/properties', async())
     }, function (props) {
         for (var b in props.node.nodes) {
-            list[props.node.nodes[b].key.replace('/reconfigure/', '')] = props.node.nodes[b].value
+            list[props.node.nodes[b].key.replace('/reconfigure/properties/', '')] = props.node.nodes[b].value
         }
         return list
     })
@@ -45,7 +45,7 @@ Consensus.prototype.list = cadence(function (async) {
 
 Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
     async(function () {
-        this.list('/reconfigure', async()) // <- error -> panic!
+        this.list(async()) // <- error -> panic!
             // ^^^ bulky, but necessary because race conditions.
     }, function (object) {
         this._listener.apply([ object, async() ]) // <- error -> panic!
@@ -57,7 +57,7 @@ Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
 }))
 
 Consensus.prototype.watch = cadence(function (async) {
-    this._watcher = this._etcd.watcher('/reconfigure', null, { recursive: true })
+    this._watcher = this._etcd.watcher('/reconfigure/properties', null, { recursive: true })
     new Delta(async()).ee(this._watcher).on('change', function (whatIsThis) {
         // ^^^ change
         this._changed(abend)
