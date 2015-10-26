@@ -3,20 +3,24 @@ require('proof')(3, require('cadence')(prove))
 function prove (async, assert) {
     var Coordinator = require('../../reconfigure/coordinator')
     var con = {
-        listeners: [],
+        listeners: false,
         initialize: function (callback) {
             callback(null)
         },
         addListener: function (url, callback) {
-            callback(null, {
-                node: {
-                    value: url
-                }
-            })
+            if (this.listeners) {
+                callback(null, false)
+            } else {
+                this.listeners = true
+                callback(null, {
+                    node: {
+                        value: url
+                    }
+                })
+            }
         },
-
         removeListener: function (url, callback) {
-            callback(null, this.listeners.indexOf(url) == -1)
+            callback(null, this.listeners)
         },
     }
     var coordinator = new Coordinator(con)
