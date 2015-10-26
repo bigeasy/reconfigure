@@ -12,18 +12,39 @@ function Consensus (host, port, listener) {
     this._turnstile = new turnstile.Turnstile
 }
 
-Consensus.prototype.stop = function () {
-    if (this._watcher != null) {
-        return this._watcher.stop()
-    }
-}
-
 Consensus.prototype.initialize = cadence(function (async) {
     async([function () {
         this._etcd.mkdir('/reconfigure/properties', async())
     }, /^Not a file$/, function (error) {
         //already initialized
     }])
+})
+
+Consensus.prototype.stop = function () {
+    if (this._watcher != null) {
+        return this._watcher.stop()
+    }
+}
+
+Consensus.prototype.addListener = cadence(function (async, url) {
+    this._etcd.set('/reconfigure/listeners/' + url.replace(/\W/g, ''), url, async())
+})
+
+Consensus.prototype.removeListener = cadence(function (async, url) {
+    this._etcd.del('/reconfigure/listeners/' + url.replace(/\W/g, ''), async())
+})
+
+Consensus.prototype.listeners = cadence(function (async) {
+    var ret = []
+    async(function () {
+        this._etcd.get('/reconfigure/listeners', async())
+    }, function (list) {
+        for (var i in list.node.nodes) {
+            ret.push(list.node.nodes[i].value)
+        }
+        return [ret]
+    })
+
 })
 
 Consensus.prototype.set = cadence(function (async, key, val) {
