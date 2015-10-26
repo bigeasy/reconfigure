@@ -1,4 +1,4 @@
-require('proof')(4, require('cadence')(prove))
+require('proof')(3, require('cadence')(prove))
 function prove (async, assert) {
     var Consensus = require('../../reconfigure/consensus')
     var exec = require('child_process').exec
@@ -47,9 +47,6 @@ function prove (async, assert) {
             consensus.set('for', 'bar', async())
         }, function (set) {
             assert(set.node.key, '/reconfigure/foo', 'key set')
-            consensus.get('for', async())
-        }, function (key) {
-            assert(key.node.value, 'bar', 'retrieved monitored value')
         }, function () {
             async(function () {
                 consensus.list(async())
