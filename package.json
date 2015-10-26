@@ -20,7 +20,7 @@
     "dependencies":
     {
                         "arguable":             "0.0.34",
-                        "cadence":              "0.4.0",
+                        "cadence":              "0.4.1",
                         "delta":                "0.0.4",
                         "inlet":                "0.2.6",
                         "prolific":             "0.0.6",
