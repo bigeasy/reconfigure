@@ -32,14 +32,9 @@ function prove (async, assert) {
              -initial-cluster-state new', async())
     }, function () {
         var wait
-        var consensus = new Consensus(ip, '2379', {
-            object: {
-                foo: function (properties, callback) {
-                    wait(null, properties)
-                    callback()
-                }
-            },
-            method: 'foo'
+        var consensus = new Consensus(ip, '2379', function (properties, callback) {
+            wait(null, properties)
+            callback()
         })
         async(function () {
             consensus.initialize(async())
