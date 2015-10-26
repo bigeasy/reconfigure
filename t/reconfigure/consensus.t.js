@@ -1,4 +1,4 @@
-require('proof')(3, require('cadence')(prove))
+require('proof')(4, require('cadence')(prove))
 function prove (async, assert) {
     var Consensus = require('../../reconfigure/consensus')
     var exec = require('child_process').exec
@@ -30,7 +30,7 @@ function prove (async, assert) {
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
     }, function () {
-        var consensus = new Consensus(ip, '2379', async())
+        var consensus = new Consensus(ip, '2379')
         async(function () {
             consensus.initialize(async())
         }, function () {
@@ -50,6 +50,17 @@ function prove (async, assert) {
                 consensus.list(async())
             }, function (list) {
                 assert.deepEqual(list, {'foo':'bar','fro':'bar','frr':'bar','for':'bar'}, 'list ok')
+            }, function () {
+                consensus.watch(async())
+                consensus.set('foo', 'blat', async()) // can't truly `watch` and `set`
+                                                      // at the same time. this
+                                                      // just ensures
+                                                      // consensus._list is
+                                                      // updated.
+                consensus.stop()
+            }, function (list) {
+                assert.notDeepEqual(list,
+                {'foo':'bar','fro':'bar','frr':'bar','for':'bar'}, 'list updated')
             })
         })
     })

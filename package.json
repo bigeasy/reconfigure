@@ -20,15 +20,14 @@
     "dependencies":
     {
                         "arguable":             "0.0.34",
-                        "cadence":              "0.2.3",
+                        "cadence":              "0.4.1",
                         "delta":                "0.0.4",
-                        "hash.murmur3.32":      "0.0.0",
                         "inlet":                "0.2.6",
                         "prolific":             "0.0.6",
-                        "magazine":             "0.0.14",
                         "turnstile":            "0.0.14",
                         "abend":                "0.0.1",
                         "vizsla":               "0.0.6",
+                        "semblance":            "0.0.4",
                         "node-etcd":            "*"
     },
     "devDependencies":
