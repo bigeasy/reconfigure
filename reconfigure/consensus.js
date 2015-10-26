@@ -7,9 +7,9 @@ var abend = require('abend')
 function Consensus (host, port, listener) {
     this._etcd = new Etcd(host, port)
     this._watcher = null
-    this._listener = listener // <- error first callback, if we get an error we panic.
+    this._listener = listener // <- asynchronous function, if we get an error we panic.
     this._turnstile = new turnstile.Turnstile
-    this._list = {}
+//    this._list = {}
 }
 
 Consensus.prototype.stop = function () {
@@ -29,7 +29,7 @@ Consensus.prototype.initialize = cadence(function (async) {
 Consensus.prototype.set = cadence(function (async, key, val) {
 // flat hierarchy so `val` should always be
     this._etcd.set('/reconfigure/' + key, val, async())
-    this._list.key = val
+//    this._list.key = val
 })
 
 // vvv Unused
@@ -39,20 +39,21 @@ Consensus.prototype.get = cadence(function (async, key) {
 })
 
 Consensus.prototype.list = cadence(function (async) {
-    this._list = {}
+    var list = {}
     async(function () {
         this._etcd.get('/reconfigure', async())
     }, function (props) {
         for (var b in props.node.nodes) {
-            this._list[props.node.nodes[b].key.replace('/reconfigure/', '')] = props.node.nodes[b].value
+            list[props.node.nodes[b].key.replace('/reconfigure/', '')] = props.node.nodes[b].value
         }
-        return this._list
+        return list
     })
 })
 
 Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
     async(function () {
         this.list('/reconfigure', async()) // <- error -> panic!
+            // ^^^ bluky, but necessary because race conditions.
     }, function (object) {
         (this._listener)(object, async()) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
