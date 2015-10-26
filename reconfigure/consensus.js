@@ -12,18 +12,54 @@ function Consensus (host, port, listener) {
     this._turnstile = new turnstile.Turnstile
 }
 
-Consensus.prototype.stop = function () {
-    if (this._watcher != null) {
-        return this._watcher.stop()
-    }
-}
-
 Consensus.prototype.initialize = cadence(function (async) {
     async([function () {
         this._etcd.mkdir('/reconfigure/properties', async())
     }, /^Not a file$/, function (error) {
         //already initialized
     }])
+})
+
+Consensus.prototype.stop = function () {
+    if (this._watcher != null) {
+        return this._watcher.stop()
+    }
+}
+
+Consensus.prototype.addListener = cadence(function (async, url) {
+    this._etcd.set('/reconfigure/listeners/' + Date.now(), url, async())
+})
+
+Consensus.prototype.removeListener = cadence(function (async, url) {
+    async(function () {
+        this._etcd.get('/reconfigure/listeners', async())
+    }, function (list) {
+        var keys = []
+        for (var i in list.node.nodes) {
+            if (list.node.nodes[i].value == url) {
+                keys.push(list.node.nodes[i].key) // don't break in case of dupes
+            }
+        }
+        return [keys]
+    }, function (keys) {
+        async.forEach(function (key) {
+            console.log(key)
+            this._etcd.del(key, async())
+        })(keys)
+    })
+})
+
+Consensus.prototype.listeners = cadence(function (async) {
+    async(function () {
+        this._etcd.get('/reconfigure/listeners', async())
+    }, function (list) {
+        var ret = []
+        for (var i in list.node.nodes) {
+            ret.push(list.node.nodes[i].value)
+        }
+        return [ret]
+    })
+
 })
 
 Consensus.prototype.set = cadence(function (async, key, val) {
