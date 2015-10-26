@@ -45,7 +45,7 @@ Consensus.prototype.list = cadence(function (async) {
 
 Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
     async(function () {
-        this.list('/reconfigure', async()) // <- error -> panic!
+        this.list(async()) // <- error -> panic!
             // ^^^ bulky, but necessary because race conditions.
     }, function (object) {
         this._listener.apply([ object, async() ]) // <- error -> panic!
