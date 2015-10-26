@@ -17,6 +17,10 @@ Consensus.prototype.initialize = cadence(function (async) {
         this._etcd.mkdir('/reconfigure/properties', async())
     }, /^Not a file$/, function (error) {
         //already initialized
+    }], [function () {
+        this._etcd.mkdir('/reconfigure/listeners', async())
+    }, /^Not a file$/, function (error) {
+        // ^^^
     }])
 })
 
@@ -27,8 +31,20 @@ Consensus.prototype.stop = function () {
 }
 
 Consensus.prototype.addListener = cadence(function (async, url) {
-    this._etcd.set('/reconfigure/listeners/' + Date.now(), url, async())
+    async(function () {
+        this.listeners(async())
+    }, function (list) {
+        for (var member in list) {
+            if (list[member] == url) {
+                return false
+            }
+        }
+        return true
+    }, function (set) {
+        if (set) this._etcd.set('/reconfigure/listeners/' + Date.now(), url, async())
+    })
 })
+
 
 Consensus.prototype.removeListener = cadence(function (async, url) {
     async(function () {
