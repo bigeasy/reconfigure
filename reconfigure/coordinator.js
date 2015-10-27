@@ -1,26 +1,23 @@
+var cadence = require('cadence')
+
 function Coordinator (consensus) {
     this._consensus = consensus
 }
 
-Coordinator.prototype.listen = function (url, callback) { // <- listen, POST, -> get them started
-    this._consensus.addListener(url, function (error, act) {
-        if (!act) {
-            callback(null, false)
-        } else {
-            callback(null, act.node.value == url)
+Coordinator.prototype.listen = cadence(function (async, url) { // <- listen, POST, -> get them started
+    async(function () {
+        this._consensus.addListener(url, async())
+    }, function (act) {
+        if (act) {
+            return (act.node.value == url)
         }
+        return false
     })
-}
+})
 
-Coordinator.prototype.unlisten = function (url, callback) {
-    this._consensus.removeListener(url, function (error, act) {
-        if (!act) {
-            callback(null, false)
-        } else {
-            callback(null, true)
-        }
-    })
-}
+Coordinator.prototype.unlisten = cadence(function (async, url) {
+    this._consensus.removeListener(url, async())
+})
 
 /*
 Coordinator.prototype.update = cadence(function (async) {
