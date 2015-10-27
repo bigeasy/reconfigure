@@ -15,15 +15,11 @@ Coordinator.prototype.listen = cadence(function (async, url) { // <- listen, POS
     })
 })
 
-Coordinator.prototype.unlisten = function (url, callback) {
-    this._consensus.removeListener(url, function (error, act) {
-        if (!act) {
-            callback(null, false)
-        } else {
-            callback(null, true)
-        }
+Coordinator.prototype.unlisten = cadence(function (async, url) {
+    async(function() {
+        this._consensus.removeListener(url, async())
     })
-}
+})
 
 /*
 Coordinator.prototype.update = cadence(function (async) {
