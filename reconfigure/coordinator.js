@@ -41,8 +41,9 @@ Coordinator.prototype.update = cadence(function (async) {
         })(list)
     })
 })
-
-module.exports = Coordinator
 /* Coordinator.prototype.set = cadence(function (async) {
     function (callback) { self.update(callback) }
 })
+*/
+
+module.exports = Coordinator
