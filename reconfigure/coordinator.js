@@ -16,9 +16,7 @@ Coordinator.prototype.listen = cadence(function (async, url) { // <- listen, POS
 })
 
 Coordinator.prototype.unlisten = cadence(function (async, url) {
-    async(function() {
-        this._consensus.removeListener(url, async())
-    })
+    this._consensus.removeListener(url, async())
 })
 
 /*
