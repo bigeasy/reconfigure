@@ -59,7 +59,6 @@ Consensus.prototype.removeListener = cadence(function (async, url) {
         return [keys]
     }, function (keys) {
         async.forEach(function (key) {
-            console.log(key)
             this._etcd.del(key, async())
         })(keys)
     })
