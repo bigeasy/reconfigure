@@ -1,26 +1,29 @@
-function Coordinator () {
-    this._listeners = []
+function Coordinator (consensus) {
+    this._consensus = consensus
 }
 
-Coordinator.prototype.listen = function (url) { // <- listen, POST, -> get them started
-    if (this._listeners.indexOf(url) < 0) {
-        this._listeners.push(url)
-        return true
-    }
-    return false
-}
-
-Coordinator.prototype.unlisten = function (url) {
-    var len = this._listeners.length
-    this._listeners = this._listeners.filter(function (el) {
-        return (url !== el)
+Coordinator.prototype.listen = function (url, callback) { // <- listen, POST, -> get them started
+    this._consensus.addListener(url, function (error, act) {
+        if (!act) {
+            callback(null, false)
+        } else {
+            callback(null, act.node.value == url)
+        }
     })
+}
 
-    return !(len == this._listeners.length)
+Coordinator.prototype.unlisten = function (url, callback) {
+    this._consensus.removeListener(url, function (error, act) {
+        if (!act) {
+            callback(null, false)
+        } else {
+            callback(null, true)
+        }
+    })
 }
 
 /*
-Consensus.prototype.update = cadence(function (async) {
+Coordinator.prototype.update = cadence(function (async) {
     async.forEach(function (urls) {
         async(function () {
             // http POST and service is missing
@@ -32,8 +35,8 @@ Consensus.prototype.update = cadence(function (async) {
         })
     })(this._listeners)
 })
-*/
 
+*/
 /* Coordinator.prototype.set = cadence(function (async) {
     function (callback) { self.update(callback) }
 })
