@@ -2,7 +2,7 @@ require('proof')(1, require('cadence')(prove))
 
 function prove (async, assert) {
     var UserAgent = require('../../reconfigure/ua')
-    var ua = new UserAgent('http://127.0.0.1:4077')
+    var ua = new UserAgent()
 
     var http = require('http')
     var Semblance = require('semblance')
@@ -12,7 +12,7 @@ function prove (async, assert) {
     async(function () {
         server.listen(4077, '127.0.0.1', async())
     }, function () {
-        ua.update({ key: 'value' }, async())
+        ua.update('http://127.0.0.1:4077', { key: 'value' }, async())
     }, function () {
         var got = semblance.shift()
         delete got.headers.connection
