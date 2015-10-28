@@ -1,13 +1,12 @@
 var Vizsla = require('vizsla')
 var cadence = require('cadence')
 
-function UserAgent (url) {
+function UserAgent () {
     this._ua = new Vizsla
-    this._session = { url: url }
 }
 
-UserAgent.prototype.update = cadence(function (async, properties) {
-    this._ua.fetch(this._session, {
+UserAgent.prototype.update = cadence(function (async, url, properties) {
+    this._ua.fetch({ url : url }, {
         payload: { properties: properties }
     }, async())
 })
