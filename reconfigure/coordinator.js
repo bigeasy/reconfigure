@@ -44,6 +44,7 @@ Coordinator.prototype.update = cadence(function (async) {
 
 Coordinator.prototype.retry = cadence(function (async) {
     var failed = Object.keys(this._failed)
+    if (!failed.length) return
     this._failed = {}
     async.forEach(function (url) {
         async(function () {
