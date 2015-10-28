@@ -3,15 +3,16 @@ require('proof')(3, require('cadence')(prove))
 function prove (async, assert) {
     var Coordinator = require('../../reconfigure/coordinator')
     var con = {
+        added: false,
         listeners: false,
         initialize: function (callback) {
             callback(null)
         },
         addListener: function (url, callback) {
-            if (this.listeners) {
+            if (this.added) {
                 callback(null, false)
             } else {
-                this.listeners = true
+                this.added = true
                 callback(null, {
                     node: {
                         value: url
@@ -20,10 +21,24 @@ function prove (async, assert) {
             }
         },
         removeListener: function (url, callback) {
-            callback(null, this.listeners)
+            callback(null, true)
         },
+        listeners: function (callback) {
+            callback(null, [['127.0.0.1:4077']])
+        },
+        list: function (callback) {
+            callback(null, { key: 'a val', anotherkey: 'a val' })
+        }
     }
-    var coordinator = new Coordinator(con)
+
+    var ua = {
+        update: function (url, properties, callback) {
+            callback(null)
+        }
+    }
+
+    var coordinator = new Coordinator(con, ua)
+
     async(function () {
         con.initialize(async())
     }, function () {
@@ -34,6 +49,8 @@ function prove (async, assert) {
         coordinator.listen('127.0.0.1:8081', async())
     }, function (listening) {
         assert(listening, false, 'no dupes')
+    }, function () {
+        coordinator.update(async())
     }, function () {
         coordinator.unlisten('127.0.0.1:8081', async())
     }, function (unlisten) {
