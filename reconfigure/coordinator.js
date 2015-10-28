@@ -1,7 +1,8 @@
 var cadence = require('cadence')
 
-function Coordinator (consensus) {
+function Coordinator (consensus, ua) {
     this._consensus = consensus
+    this._ua = ua
 }
 
 Coordinator.prototype.listen = cadence(function (async, url) { // <- listen, POST, -> get them started
@@ -26,19 +27,15 @@ Coordinator.prototype.list = cadence(function (async) {
 Coordinator.prototype.update = cadence(function (async) {
     async(function () {
         this._consensus.listeners(async())
-    }, function (list) {
-        async.forEach(function (urls) {
-            /*
+        this.list(async())
+    }, function (urls, list) {
+        async.forEach(function (url) {
             async(function () {
-                // http POST and service is missing
-            }, function (body, response) {
-                if (!response.okay) {
-                    setTimeout(function () { }, 60000)
-                }
-            }, function () {
+                this._ua.update(url, list, async())
+            }, function (ok) {
+                console.log(arguments)
             })
-                */
-        })(list)
+        })(urls)
     })
 })
 /* Coordinator.prototype.set = cadence(function (async) {
