@@ -43,18 +43,19 @@ Coordinator.prototype.update = cadence(function (async) {
 })
 
 Coordinator.prototype.retry = cadence(function (async) {
-    if (Object.keys(this._failed).length < 1) return
+    var failed = Object.keys(this._failed)
+    this._failed = {}
     async.forEach(function (url) {
         async(function () {
             this.list(async())
         }, function (list) {
             this._ua.update(url, list, async())
         }, function (ok) {
-            if (ok) {
-                delete this._failed[url]
+            if (!ok) {
+                this._failed[url] = true
             }
         })
-    })(Object.keys(this._failed))
+    })(failed)
 })
 
 /* Coordinator.prototype.set = cadence(function (async) {
