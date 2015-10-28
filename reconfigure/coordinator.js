@@ -46,17 +46,22 @@ Coordinator.prototype.retry = cadence(function (async) {
     var failed = Object.keys(this._failed)
     if (!failed.length) return
     this._failed = {}
-    async.forEach(function (url) {
-        async(function () {
-            this.list(async())
-        }, function (list) {
-            this._ua.update(url, list, async())
-        }, function (ok) {
-            if (!ok) {
-                this._failed[url] = true
+    async(function () {
+        this.list(async())
+        this._consensus.listeners(async())
+    }, function (list, listeners) {
+        async.forEach(function (url) {
+            if (listeners.indexOf(url)) {
+                async(function () {
+                    this._ua.update(url, list, async())
+                }, function (ok) {
+                    if (!ok) {
+                        this._failed[url] = true
+                    }
+                })
             }
-        })
-    })(failed)
+        })(failed)
+    })
 })
 
 /* Coordinator.prototype.set = cadence(function (async) {
