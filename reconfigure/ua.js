@@ -6,10 +6,14 @@ function UserAgent () {
 }
 
 UserAgent.prototype.update = cadence(function (async, url, properties) {
-    this._ua.fetch({
-            url: url,
-            post: { properties: properties }
-    }, async())
+    async(function () {
+        this._ua.fetch({
+                url: url,
+                post: { properties: properties }
+        }, async())
+    }, function (body, response) {
+        return response.okay
+    })
 })
 
 module.exports = UserAgent

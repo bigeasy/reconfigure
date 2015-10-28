@@ -32,13 +32,8 @@ Coordinator.prototype.update = cadence(function (async) {
         async.forEach(function (url) {
             async(function () {
                 this._ua.update(url, list, async())
-            }, function (body, response) {
-            /*
+            }, function (ok) {
                 console.log(arguments)
-                if (!response.okay) {
-                    setTimeout(function () { }, 60000)
-                }
-                */
             })
         })(urls)
     })
