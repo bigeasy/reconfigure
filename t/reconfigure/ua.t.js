@@ -21,11 +21,11 @@ function prove (async, assert) {
             headers: {
                 'content-type': 'application/json',
                 accept: 'application/json',
-                'content-length': '15',
+                'content-length': '30',
                 host: '127.0.0.1:4077'
             },
             url: '/',
-            body: { key: 'value' }
+            body: { properties: { key: 'value' } }
         }, 'token')
         server.close(async())
     })
