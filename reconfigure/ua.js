@@ -5,9 +5,9 @@ function UserAgent () {
     this._ua = new Vizsla
 }
 
-UserAgent.prototype.update = cadence(function (async, url, properties) {
-    this._ua.fetch({ url : url }, {
-        payload: { properties: properties }
+UserAgent.prototype.update = cadence(function (async, data) {
+    this._ua.fetch({ url : data.url }, {
+        post: { properties: data.properties }
     }, async())
 })
 

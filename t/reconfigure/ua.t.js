@@ -12,7 +12,7 @@ function prove (async, assert) {
     async(function () {
         server.listen(4077, '127.0.0.1', async())
     }, function () {
-        ua.update('http://127.0.0.1:4077', { key: 'value' }, async())
+        ua.update({url: 'http://127.0.0.1:4077', properties: { key: 'value' }}, async())
     }, function () {
         var got = semblance.shift()
         delete got.headers.connection
