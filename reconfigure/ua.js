@@ -6,8 +6,6 @@ function UserAgent () {
 }
 
 UserAgent.prototype.update = cadence(function (async, url, properties) {
-    console.log(arguments)
-    console.log(properties)
     this._ua.fetch({
             url: url,
             post: properties
