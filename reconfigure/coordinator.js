@@ -3,6 +3,7 @@ var cadence = require('cadence')
 function Coordinator (consensus, ua) {
     this._consensus = consensus
     this._ua = ua
+    this._failed= {}
 }
 
 Coordinator.prototype.listen = cadence(function (async, url) { // <- listen, POST, -> get them started
@@ -33,11 +34,29 @@ Coordinator.prototype.update = cadence(function (async) {
             async(function () {
                 this._ua.update(url, list, async())
             }, function (ok) {
-                console.log(arguments)
+                if (!ok) {
+                    this._failed[url] = true
+                }
             })
         })(urls)
     })
 })
+
+Coordinator.prototype.retry = cadence(function (async) {
+    if (Object.keys(this._failed).length < 1) return
+    async.forEach(function (url) {
+        async(function () {
+            this.list(async())
+        }, function (list) {
+            this._ua.update(url, list, async())
+        }, function (ok) {
+            if (ok) {
+                delete this._failed[url]
+            }
+        })
+    })(Object.keys(this._failed))
+})
+
 /* Coordinator.prototype.set = cadence(function (async) {
     function (callback) { self.update(callback) }
 })
