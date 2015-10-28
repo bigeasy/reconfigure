@@ -1,4 +1,4 @@
-require('proof')(3, require('cadence')(prove))
+require('proof')(4, require('cadence')(prove))
 
 function prove (async, assert) {
     var Coordinator = require('../../reconfigure/coordinator')
@@ -33,7 +33,7 @@ function prove (async, assert) {
 
     var ua = {
         update: function (url, properties, callback) {
-            callback(null)
+            callback(null, true)
         }
     }
 
@@ -51,7 +51,8 @@ function prove (async, assert) {
         assert(listening, false, 'no dupes')
     }, function () {
         coordinator.update(async())
-    }, function () {
+    }, function (updated) {
+        assert(updated, true, 'updated')
         coordinator.unlisten('127.0.0.1:8081', async())
     }, function (unlisten) {
         assert(unlisten, true, 'unlisten on 8081')
