@@ -6,7 +6,7 @@
   ___ greeting, usage ___ en_US ___
   usage: node.bin.js
 
-  ___ reconfigure, usage ___ en_US ___
+  ___ serve, usage ___ en_US ___
   usage: node bin.js reconfigure server
 
   options:
@@ -17,7 +17,7 @@
 
 require('arguable')(module, require('cadence')(function (async, options) {
     switch (options.command[0]) {
-        case 'reconfigure':
+        case 'serve':
             console.log('coming soon')
             if ((options.param.listen != null) || (options.param.id != null)) {
                 console.log('bind:' + options.param.listen + ' id:' + options.param.id)
