@@ -1,23 +1,34 @@
 #!/usr/bin/env/node
 
 /*
-  ___ usage ___ en_US ___
-  usage: node bin.js [options]
 
    Provide a command-line interface for `reconfigure`.
-
   ___ greeting, usage ___ en_US ___
-  usage: node bin.js greeting
+  usage: node.bin.js
+
+  ___ reconfigure, usage ___ en_US ___
+  usage: node bin.js reconfigure server
 
   options:
-  -s, --string      [string]    a string to print.
+  -l, --listen      [string]    IP and port to bind to.
+  -i, --id          [string]    reconfigure instance ID (or IP)
   ___ ___ ___
 */
 
 require('arguable')(module, require('cadence')(function (async, options) {
-    if (options.param.string != null) {
-        console.log(options.param.string)
-    } else {
-        console.log('Hello, World!')
+    switch (options.command[0]) {
+        case 'reconfigure':
+            console.log('coming soon')
+            if ((options.param.listen != null) || (options.param.id != null)) {
+                console.log('bind:' + options.param.listen + ' id:' + options.param.id)
+            }
+            break
+        case 'greeting':
+            if (options.param.string != null) {
+                console.log(options.param.string)
+            } else {
+                console.log('Hello, World!')
+            }
+            break
     }
 }))
