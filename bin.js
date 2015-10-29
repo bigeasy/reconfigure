@@ -18,10 +18,17 @@
 require('arguable')(module, require('cadence')(function (async, options) {
     switch (options.command[0]) {
         case 'serve':
+            var ip, port
             console.log('coming soon')
-            if ((options.param.listen != null) || (options.param.id != null)) {
-                console.log('bind:' + options.param.listen + ' id:' + options.param.id)
+            ip = options.param.listen.split(':')
+            if (ip.length) {
+                port = ip[1]
+                ip = ip[0]
+            } else {
+                port = '8080'
+                ip = ip[0]
             }
+            console.log('ip: ' + ip + ' port: ' + port)
             break
         case 'greeting':
             if (options.param.string != null) {
