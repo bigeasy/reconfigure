@@ -2,9 +2,12 @@
 
 /*
   ___ usage ___ en_US ___
-  usage: node bin.js -s 'stuff'
+  usage: node bin.js [options]
 
    Provide a command-line interface for `reconfigure`.
+
+  ___ greeting, usage ___ en_US ___
+  usage: node bin.js greeting
 
   options:
   -s, --string      [string]    a string to print.
