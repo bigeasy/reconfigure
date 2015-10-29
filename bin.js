@@ -19,7 +19,7 @@ require('arguable')(module, require('cadence')(function (async, options) {
     var UserAgent = require('./reconfigure/ua.js')
     var Consensus = require('./reconfigure/consensus.js')
     var Coordinator = require('./reconfigure/coordinator.js')
-    var service = require ('./reconfigure/http.js')
+    var Service = require ('./reconfigure/http.js')
     var http = require('http')
     switch (options.command[0]) {
         case 'serve':
