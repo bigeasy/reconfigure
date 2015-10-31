@@ -24,7 +24,7 @@
         port is not integer:
             the `--port` must be an integer
 
-    ___ ___ ___
+    ___ . ___
 */
 
 var Reconfigure = require('./reconfigure/http')
