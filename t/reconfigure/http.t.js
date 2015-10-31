@@ -1,4 +1,4 @@
-require('proof')(1, require('cadence')(prove))
+require('proof')(3, require('cadence')(prove))
 
 function prove (async, assert) {
     var UserAgent = require('vizsla')
@@ -13,7 +13,17 @@ function prove (async, assert) {
         ua.fetch(session, async())
     }, function (body) {
         assert(body.toString(), 'Reconfigure API', 'index')
-    }, function () {
+        session.url += '/register'
+        session.post = { url: 'blegh' }
+        ua.fetch(session, async())
+    }, function (body) {
+        assert(body.toString(), 'listener ' + session.post.url + ' has joined',
+        'registered')
+        session.url = session.url.replace('register', 'deregister')
+        ua.fetch(session, async())
+    }, function (body) {
+        assert(body.toString(), 'listener ' + session.post.url + ' has left',
+        'deregistered')
          server.close(async())
     })
 }
