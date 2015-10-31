@@ -12,7 +12,7 @@
   options:
   -l, --listen      [string]    IP and port to bind to.
   -i, --id          [string]    reconfigure instance ID (or IP)
-  ___ ___ ___
+  ___ . ___
 */
 
 require('arguable')(module, require('cadence')(function (async, options) {
