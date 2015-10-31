@@ -43,7 +43,7 @@ Reconfigure.prototype.set = cadence(function (async, post) {
     }, function () {
         return 'listener at ' + body.headers.host + ' set \'' + post.body.key +
         '\' to ' + post.body.value
-    }
+    })
 })
 
 Reconfigure.prototype.list = cadence(function (async) {
@@ -51,6 +51,6 @@ Reconfigure.prototype.list = cadence(function (async) {
         this._coordinator.list(async())
     }, function (list) {
         return { values: list }
-    }
+    })
 })
 module.exports = Reconfigure
