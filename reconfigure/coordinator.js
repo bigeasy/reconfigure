@@ -64,9 +64,8 @@ Coordinator.prototype.retry = cadence(function (async) {
     })
 })
 
-/* Coordinator.prototype.set = cadence(function (async) {
-    function (callback) { self.update(callback) }
+Coordinator.prototype.set = cadence(function (async, key, value) {
+    this._consensus.set(key, value, async())
 })
-*/
 
 module.exports = Coordinator
