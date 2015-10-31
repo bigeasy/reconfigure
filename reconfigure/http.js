@@ -1,8 +1,6 @@
 var cadence = require('cadence')
 var Dispatcher = require('inlet/dispatcher')
 var logger = require('prolific').createLogger('diverter.allocator')
-var Consensus = require('./consensus')
-var Coordinator = require('./coordinator')
 var useragent = require('./ua')
 
 function Reconfigure (coordinator) {
