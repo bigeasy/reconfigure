@@ -3,7 +3,16 @@ require('proof')(3, require('cadence')(prove))
 function prove (async, assert) {
     var UserAgent = require('vizsla')
     var Reconfigure = require('../../reconfigure/http')
-    var reconfigure = new Reconfigure
+    var coord = {
+        listen: function (url, callback) {
+            callback(null)
+        },
+
+        unlisten: function (url, callback) {
+            callback(null)
+        }
+    }
+    var reconfigure = new Reconfigure(coord)
     var http = require('http')
     var server = http.createServer(reconfigure.dispatcher({}).server())
     var ua = new UserAgent, session = { url: 'http://127.0.0.1:8077' }
