@@ -27,14 +27,14 @@ function prove (async, assert) {
             post: { url: 'blegh' }
         }, async())
     }, function (body) {
-        assert(body.toString(), 'listener blegh has joined',
+        assert(body.response, 'listener blegh has joined',
         'registered')
         ua.fetch(session, {
             url: '/deregister',
             post: { url: 'blegh' }
         }, async())
     }, function (body) {
-        assert(body.toString(), 'listener blegh has left',
+        assert(body.response, 'listener blegh has left',
         'deregistered')
          server.close(async())
     })
