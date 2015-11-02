@@ -1,4 +1,4 @@
-require('proof')(1, require('cadence')(prove))
+require('proof')(2, require('cadence')(prove))
 
 function prove (async, assert) {
     var bin = require('../../reconfigure.bin'), io
@@ -35,5 +35,12 @@ function prove (async, assert) {
     }, function () {
         assert(true, 'running')
         io.events.emit('SIGINT')
+    }, function () {
+        bin({}, ['set', '--etcdaddr=' + ip + ':2379', '--key=greeting',
+        '--value=Hello World!'], {}, async())
+    }, function () {
+       bin({}, ['list', '--etcdaddr=' + ip + ':2379'], {}, async())
+    }, function (list) {
+        assert(list.values, { greeting: 'Hello World!' }, 'key set and retrieved')
     })
 }

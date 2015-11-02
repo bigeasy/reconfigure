@@ -5,15 +5,21 @@
         -i, --ip        <string>    address to bind to
         -p, --port      <integer>   port to bind to
         -l, --log       <string>    path to a log file
-        -a, --etcdaddr <string>    etcd address and port to listen to
+        -a, --etcdaddr <string>    etcd address and port
             --help                  display this message
     ___ serve, $ ___ en_US ___
 
     ___ set, usage ___ en_US ___
     usage: node reconfigure.bin.js set <args>
 
+        -a, --etcdaddr  <string>    etcd address and port
         -k, --key       <string>    key to set
-        -v, --value     <string     value to set
+        -v, --value     <string>    value to set
+
+    ___ list, usage ___ en_US ___
+    usage: node reconfigure.bin.js list <args>
+
+        -a, --etcdaddr  <string>    etcd address and port
 
         first is required:
             error: the `--first` URL is a required argument
@@ -56,7 +62,7 @@ require('arguable')(module, require('cadence')(function (async, options) {
                 options.param.ip, // switch to key
                 options.param.etcdaddr.split(':')[0],
                 etcdport,
-                function () {} //panic
+                function () {console.log('panic')} //panic
             ),
             new UserAgent()
         )
@@ -64,13 +70,22 @@ require('arguable')(module, require('cadence')(function (async, options) {
         coord._consensus.initialize(async())
     }, function () {
         var reconfigure = new Reconfigure(coord)
-        switch (options.command) {
+        switch (options.command[0]) {
             case 'serve':
-                    var server = http.createServer(reconfigure.dispatcher().server())
-                    options.signal('SIGINT', function () { server.close() })
-                    server.listen(options.param.port, options.param.ip, async())
+                var server = http.createServer(reconfigure.dispatcher().server())
+                options.signal('SIGINT', function () { server.close() })
+                server.listen(options.param.port, options.param.ip, async())
                 break
             case 'set':
+                reconfigure.set({
+                    body: {
+                        key: options.param.key,
+                        value: options.param.value
+                    }
+                }, async())
+                break
+            case 'list':
+                reconfigure.list(async())
                 break
         }
     })
