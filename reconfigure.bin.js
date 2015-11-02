@@ -47,7 +47,7 @@ var UserAgent = require('./reconfigure/ua')
 var Vizsla = require('vizsla')
 
 require('arguable')(module, require('cadence')(function (async, options) {
-    var reconfigure, coord, etcdport
+    var reconfigure, coord, etcdport, server
     var ua = new Vizsla()
     options.helpIf(options.param.help)
     options.param.ip || (options.param.ip = '127.0.0.1')
