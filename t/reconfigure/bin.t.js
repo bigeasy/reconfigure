@@ -1,4 +1,4 @@
-require('proof')(2, require('cadence')(prove))
+require('proof')(5, require('cadence')(prove))
 
 function prove (async, assert) {
     var bin = require('../../reconfigure.bin'), io
@@ -39,8 +39,17 @@ function prove (async, assert) {
         bin({}, ['set', '--etcdaddr=' + ip + ':2379', '--key=greeting',
         '--value=Hello World!'], {}, async())
     }, function () {
-       bin({}, ['list', '--etcdaddr=' + ip + ':2379'], {}, async())
+        bin({}, ['list', '--etcdaddr=' + ip + ':2379'], {}, async())
     }, function (list) {
         assert(list.values, { greeting: 'Hello World!' }, 'key set and retrieved')
+        bin({}, ['register', '--etcdaddr=' + ip + ':2379', '--url=blah:4001'], {}, async())
+    }, function (ret) {
+        assert(ret.success, true, 'registered')
+       bin({}, ['register', '--etcdaddr=' + ip + ':2379', '--url=blah:4001'], {}, async())
+    }, function (ret) {
+        assert(ret.extant, true, 'duplicant registry')
+        bin({}, ['deregister', '--etcdaddr=' + ip + ':2379', '--url=blah:4001'], {}, async())
+    }, function (ret) {
+        assert(ret.success, true, 'deregistered')
     })
 }

@@ -5,21 +5,33 @@
         -i, --ip        <string>    address to bind to
         -p, --port      <integer>   port to bind to
         -l, --log       <string>    path to a log file
-        -a, --etcdaddr <string>    etcd address and port
+        -e, --etcdaddr <string>    etcd address and port
             --help                  display this message
     ___ serve, $ ___ en_US ___
 
     ___ set, usage ___ en_US ___
     usage: node reconfigure.bin.js set <args>
 
-        -a, --etcdaddr  <string>    etcd address and port
+        -e, --etcdaddr  <string>    etcd address and port
         -k, --key       <string>    key to set
         -v, --value     <string>    value to set
 
     ___ list, usage ___ en_US ___
     usage: node reconfigure.bin.js list <args>
 
-        -a, --etcdaddr  <string>    etcd address and port
+        -e, --etcdaddr  <string>    etcd address and port
+
+    ___ register, usage ___ en_US ___
+    usage: node reconfigure.bin.js register <args>
+
+        -e, --etcdaddr  <string>    etcd address and port
+        -u, --url       <string>    listener address/port
+
+    ___ deregister, usage ___ en_US ___
+    usage: node reconfigure.bin.js deregister <args>
+
+        -e, --etcdaddr  <string>    etcd address and port
+        -u, --url       <string>    listener address/port
 
         first is required:
             error: the `--first` URL is a required argument
@@ -86,6 +98,20 @@ require('arguable')(module, require('cadence')(function (async, options) {
                 break
             case 'list':
                 reconfigure.list(async())
+                break
+            case 'register':
+                reconfigure.register({
+                    body: {
+                        url: options.param.url
+                    }
+                }, async())
+                break
+            case 'deregister':
+                reconfigure.deregister({
+                    body: {
+                        url: options.param.url
+                    }
+                }, async())
                 break
         }
     })
