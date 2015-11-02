@@ -80,18 +80,15 @@ require('arguable')(module, require('cadence')(function (async, options) {
             break
 
         case 'set':
-            async(function () {
-                ua.fetch({
-                    url: 'http://' + options.argv[0]
-                }, {
-                    url: '/set',
-                    post: {
-                        key: options.argv[1],
-                        value: options.argv[2]
-                    }
+            ua.fetch({
+                url: 'http://' + options.argv[0]
+            }, {
+                url: '/set',
+                post: {
+                    key: options.argv[1],
+                    value: options.argv[2]
+                }
                 }, async())
-            }, function (body, response) {
-            })
             break
 
         case 'list':
@@ -114,31 +111,25 @@ require('arguable')(module, require('cadence')(function (async, options) {
             break
 
         case 'register':
-            async(function () {
-                ua.fetch({
-                        url: 'http://' + options.argv[0]
-                }, {
-                    url: '/register',
-                    post: {
-                        url: options.argv[1]
-                    }
-                }, async())
-            }, function () {
-            })
+            ua.fetch({
+                    url: 'http://' + options.argv[0]
+            }, {
+                url: '/register',
+                post: {
+                    url: options.argv[1]
+                }
+            }, async())
             break
 
         case 'deregister':
-            async(function () {
-                ua.fetch({
-                        url: 'http://' + options.argv[0]
-                }, {
-                    url: '/register',
-                    post: {
-                        url: options.argv[1]
-                    }
-                }, async())
-            }, function () {
-            })
+            ua.fetch({
+                    url: 'http://' + options.argv[0]
+            }, {
+                url: '/register',
+                post: {
+                    url: options.argv[1]
+                }
+            }, async())
             break
 
         case 'stop':
