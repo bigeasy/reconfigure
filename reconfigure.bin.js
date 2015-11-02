@@ -7,8 +7,13 @@
         -l, --log       <string>    path to a log file
         -a, --etcdaddr <string>    etcd address and port to listen to
             --help                  display this message
-
     ___ serve, $ ___ en_US ___
+
+    ___ set, usage ___ en_US ___
+    usage: node reconfigure.bin.js set <args>
+
+        -k, --key       <string>    key to set
+        -v, --value     <string     value to set
 
         first is required:
             error: the `--first` URL is a required argument
@@ -38,7 +43,6 @@ require('arguable')(module, require('cadence')(function (async, options) {
     var reconfigure, coord, etcdport
     options.helpIf(options.param.help)
 //    options.required('ip')
-
     options.param.ip || (options.param.ip = '127.0.0.1')
     options.param.etcdaddr || (options.param.etcdaddr = '127.0.0.1:2379')
     options.param.port || (options.param.port = 8080)
@@ -60,8 +64,14 @@ require('arguable')(module, require('cadence')(function (async, options) {
         coord._consensus.initialize(async())
     }, function () {
         var reconfigure = new Reconfigure(coord)
-        var server = http.createServer(reconfigure.dispatcher().server())
-        options.signal('SIGINT', function () { server.close() })
-        server.listen(options.param.port, options.param.ip, async())
+        switch (options.command) {
+            case 'serve':
+                    var server = http.createServer(reconfigure.dispatcher().server())
+                    options.signal('SIGINT', function () { server.close() })
+                    server.listen(options.param.port, options.param.ip, async())
+                break
+            case 'set':
+                break
+        }
     })
 }))
