@@ -24,8 +24,12 @@ Reconfigure.prototype.index = cadence(function (async) {
 Reconfigure.prototype.register = cadence(function (async, post) {
     async(function () {
         this._coordinator.listen(post.body.url, async())
-    }, function () {
-        return 'listener ' + post.body.url + ' has joined'
+    }, function (dupe) {
+        return {
+            extant: dupe,
+            url: post.body.url,
+            success: true
+        }
     })
 })
 
@@ -33,7 +37,10 @@ Reconfigure.prototype.deregister = cadence(function (async, post) {
     async(function () {
         this._coordinator.unlisten(post.body.url, async())
     }, function () {
-        return 'listener ' + post.body.url + ' has left'
+        return {
+            url: post.body.url,
+            success: true
+        }
     })
 })
 
@@ -41,8 +48,11 @@ Reconfigure.prototype.set = cadence(function (async, post) {
     async(function () {
         this._coordinator.set(post.body.key, post.body.value, async())
     }, function () {
-        return 'listener at ' + body.headers.host + ' set \'' + post.body.key +
-        '\' to ' + post.body.value
+        return {
+            key: post.body.key,
+            value: post.body.value,
+            success: true
+        }
     })
 })
 

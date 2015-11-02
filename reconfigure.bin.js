@@ -29,8 +29,12 @@
 
 var Reconfigure = require('./reconfigure/http')
 var http = require('http')
+var Coordinator = require('./reconfigure/coordinator')
+var Consensus = require('./reconfigure/consensus')
+var UserAgent = require('./reconfigure/ua')
 
 require('arguable')(module, require('cadence')(function (async, options) {
+    var reconfigure, coord
     options.helpIf(options.param.help)
 //    options.required('ip')
 
@@ -39,9 +43,26 @@ require('arguable')(module, require('cadence')(function (async, options) {
 
     options.validate('%s is not integer', 'port', /^\d+$/)
 
-    var reconfigure = new Reconfigure
-
-    var server = http.createServer(reconfigure.dispatcher().server())
-    options.signal('SIGINT', function () { server.close() })
-    server.listen(options.param.port, options.param.address, async())
+    /*
+    async(function () {
+        async(function () {
+            coord = new Coordinator(
+                new Consensus(
+                    options.param.ip, // switch to key
+                    options.param.ip,
+                    options.param.port,
+                    async()
+                ),
+                new UserAgent()
+            )
+        }, function () {
+            // panic
+        })
+    }, function () {
+    */
+        var reconfigure = new Reconfigure
+        var server = http.createServer(reconfigure.dispatcher().server())
+        options.signal('SIGINT', function () { server.close() })
+        server.listen(options.param.port, options.param.address, async())
+    //})
 }))
