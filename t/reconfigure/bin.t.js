@@ -31,7 +31,7 @@ function prove (async, assert) {
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
     }, function () {
-        io = bin({}, ['serve', '--port=2379', '--etcdaddr=' + ip + ':2379'], {}, async())
+        io = bin({}, ['serve', '--port=2390', '--etcdaddr=' + ip + ':2379'], {}, async())
     }, function () {
         assert(true, 'running')
         io.events.emit('SIGINT')
