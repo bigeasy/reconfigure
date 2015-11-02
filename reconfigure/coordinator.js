@@ -13,7 +13,7 @@ Coordinator.prototype.listen = cadence(function (async, url) { // <- listen, POS
         if (act) {
             return (act.node.value == url)
         }
-        return false
+        return true
     })
 })
 
