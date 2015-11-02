@@ -5,6 +5,7 @@
         -i, --ip        <string>    address to bind to
         -p, --port      <integer>   port to bind to
         -l, --log       <string>    path to a log file
+        -a, --etcdaddr <string>    etcd address and port to listen to
             --help                  display this message
 
     ___ serve, $ ___ en_US ___
@@ -34,21 +35,23 @@ var Consensus = require('./reconfigure/consensus')
 var UserAgent = require('./reconfigure/ua')
 
 require('arguable')(module, require('cadence')(function (async, options) {
-    var reconfigure, coord
+    var reconfigure, coord, etcdport
     options.helpIf(options.param.help)
 //    options.required('ip')
 
     options.param.ip || (options.param.ip = '127.0.0.1')
+    options.param.etcdaddr || (options.param.etcdaddr = '127.0.0.1:2379')
     options.param.port || (options.param.port = 8080)
 
     options.validate('%s is not integer', 'port', /^\d+$/)
+    etcdport = options.param.etcdaddr.split(':')[1]
 
     async(function () {
         coord = new Coordinator(
             new Consensus(
                 options.param.ip, // switch to key
-                options.param.ip,
-                options.param.port,
+                options.param.etcdaddr.split(':')[0],
+                etcdport,
                 function () {} //panic
             ),
             new UserAgent()
