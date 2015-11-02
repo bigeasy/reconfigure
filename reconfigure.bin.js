@@ -43,6 +43,7 @@ require('arguable')(module, require('cadence')(function (async, options) {
 
     options.validate('%s is not integer', 'port', /^\d+$/)
 
+    /*
     async(function () {
         async(function () {
             coord = new Coordinator(
@@ -58,9 +59,10 @@ require('arguable')(module, require('cadence')(function (async, options) {
             // panic
         })
     }, function () {
-        var reconfigure = new Reconfigure(coord)
+    */
+        var reconfigure = new Reconfigure
         var server = http.createServer(reconfigure.dispatcher().server())
         options.signal('SIGINT', function () { server.close() })
         server.listen(options.param.port, options.param.address, async())
-    })
+    //})
 }))
