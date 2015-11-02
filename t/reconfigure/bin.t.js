@@ -34,22 +34,21 @@ function prove (async, assert) {
         io = bin({}, ['serve', '--port=2390', '--etcdaddr=' + ip + ':2379'], {}, async())
     }, function () {
         assert(true, 'running')
-        io.events.emit('SIGINT')
+        bin({}, ['set', '127.0.0.1:2390', 'greeting',
+        'Hello World!'], {}, async())
     }, function () {
-        bin({}, ['set', '--etcdaddr=' + ip + ':2379', '--key=greeting',
-        '--value=Hello World!'], {}, async())
-    }, function () {
-        bin({}, ['list', '--etcdaddr=' + ip + ':2379'], {}, async())
-    }, function (list) {
-        assert(list.values, { greeting: 'Hello World!' }, 'key set and retrieved')
-        bin({}, ['register', '--etcdaddr=' + ip + ':2379', '--url=blah:4001'], {}, async())
+        bin({}, ['list', '127.0.0.1:2390'], {}, async())
+    }, function (values) {
+        assert(values, 'greeting\tHello World!\n', 'key set and retrieved')
+        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.success, true, 'registered')
-       bin({}, ['register', '--etcdaddr=' + ip + ':2379', '--url=blah:4001'], {}, async())
+       bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.extant, true, 'duplicant registry')
-        bin({}, ['deregister', '--etcdaddr=' + ip + ':2379', '--url=blah:4001'], {}, async())
+        bin({}, ['deregister', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.success, true, 'deregistered')
+        io.events.emit('SIGINT')
     })
 }

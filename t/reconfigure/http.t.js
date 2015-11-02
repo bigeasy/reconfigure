@@ -40,7 +40,6 @@ function prove (async, assert) {
             post: { url: 'blegh' }
         }, async())
     }, function (body) {
-        console.log(body)
         assert(body.extant, true, 'duplicant registry')
         ua.fetch(session, {
             url: '/deregister',
