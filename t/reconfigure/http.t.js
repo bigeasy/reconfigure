@@ -1,11 +1,17 @@
-require('proof')(3, require('cadence')(prove))
+require('proof')(4, require('cadence')(prove))
 
 function prove (async, assert) {
     var UserAgent = require('vizsla')
     var Reconfigure = require('../../reconfigure/http')
     var coord = {
+        listeners: [],
         listen: function (url, callback) {
-            callback(null)
+            if (this.listeners.indexOf(url) > -1) {
+                callback(null, true)
+            } else {
+                this.listeners.push(url)
+                callback(null, false)
+            }
         },
 
         unlisten: function (url, callback) {
@@ -27,14 +33,21 @@ function prove (async, assert) {
             post: { url: 'blegh' }
         }, async())
     }, function (body) {
-        assert(body.response, 'listener blegh has joined',
+        assert(body.url, 'blegh',
         'registered')
+        ua.fetch(session, {
+            url: '/register',
+            post: { url: 'blegh' }
+        }, async())
+    }, function (body) {
+        console.log(body)
+        assert(body.extant, true, 'duplicant registry')
         ua.fetch(session, {
             url: '/deregister',
             post: { url: 'blegh' }
         }, async())
     }, function (body) {
-        assert(body.response, 'listener blegh has left',
+        assert(body.success, true,
         'deregistered')
          server.close(async())
     })
