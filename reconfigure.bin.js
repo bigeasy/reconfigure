@@ -1,13 +1,13 @@
 /*
-    ___ usage ___ en_US ___
-    usage: node reconfigure.bin.js
+    ___ serve, usage ___ en_US ___
+    usage: node reconfigure.bin.js serve <args>
 
         -i, --ip        <string>    address to bind to
         -p, --port      <integer>   port to bind to
         -l, --log       <string>    path to a log file
             --help                  display this message
 
-    ___ $ ___ en_US ___
+    ___ serve, $ ___ en_US ___
 
         first is required:
             error: the `--first` URL is a required argument
@@ -43,26 +43,22 @@ require('arguable')(module, require('cadence')(function (async, options) {
 
     options.validate('%s is not integer', 'port', /^\d+$/)
 
-    /*
     async(function () {
-        async(function () {
-            coord = new Coordinator(
-                new Consensus(
-                    options.param.ip, // switch to key
-                    options.param.ip,
-                    options.param.port,
-                    async()
-                ),
-                new UserAgent()
-            )
-        }, function () {
-            // panic
-        })
+        coord = new Coordinator(
+            new Consensus(
+                options.param.ip, // switch to key
+                options.param.ip,
+                options.param.port,
+                function () {} //panic
+            ),
+            new UserAgent()
+        )
     }, function () {
-    */
-        var reconfigure = new Reconfigure
+        coord._consensus.initialize(async())
+    }, function () {
+        var reconfigure = new Reconfigure(coord)
         var server = http.createServer(reconfigure.dispatcher().server())
         options.signal('SIGINT', function () { server.close() })
-        server.listen(options.param.port, options.param.address, async())
-    //})
+        server.listen(options.param.port, options.param.ip, async())
+    })
 }))
