@@ -31,9 +31,10 @@ function prove (async, assert) {
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
     }, function () {
-        var consensus = new Consensus('test', ip, '2379', function (callback) {
+        var wait, consensus = new Consensus('test', ip, '2379', function (callback) {
             assert(true, 'listener called')
             callback(null)
+            wait()
         })
         async(function () {
             consensus.initialize(async())
@@ -74,6 +75,7 @@ function prove (async, assert) {
                 setTimeout(async(), 2500)
             }, function () {
                 async(function () {
+                    wait = async()
                     consensus.set('foo', 'blat', async()) // can't truly `watch` and `set`
                                                           // at the same time. this
                                                           // just ensures
