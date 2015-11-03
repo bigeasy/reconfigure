@@ -112,8 +112,4 @@ Consensus.prototype.watch = cadence(function (async) {
     }.bind(this)).on('stop')
 })
 
-function main () {
-    consensus.watch(abend)
-}
-
 module.exports = Consensus
