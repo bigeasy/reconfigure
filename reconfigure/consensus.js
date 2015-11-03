@@ -1,9 +1,10 @@
 var Etcd = require('node-etcd')
 var cadence = require('cadence')
 var Delta = require('delta')
-var turnstile = require('turnstile')
 var abend = require('abend')
 var Operation = require('operation')
+var restrict = require('restrictor')
+var turnstile = require('turnstile')
 
 function Consensus (key, host, port, listener) {
     this._etcd = new Etcd(host, port)
@@ -95,17 +96,12 @@ Consensus.prototype.list = cadence(function (async) {
     })
 })
 
-Consensus.prototype._changed = turnstile.throttle(cadence(function (async) {
-    async(function () {
-        this.list(async()) // <- error -> panic!
-            // ^^^ bulky, but necessary because race conditions.
-    }, function (object) {
-        this._listener.apply([ object, async() ]) // <- error -> panic!
+Consensus.prototype._changed = restrict(cadence(function (async) {
+    this._listener.apply([ async() ]) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
         // up in the next tick queue?
         // ^^^ should, we don't know how, use Cadence exceptions to do the right
         // thing.
-    })
 }))
 
 Consensus.prototype.watch = cadence(function (async) {
@@ -117,7 +113,7 @@ Consensus.prototype.watch = cadence(function (async) {
 })
 
 function main () {
-    consesus.watch(abend)
+    consensus.watch(abend)
 }
 
 module.exports = Consensus

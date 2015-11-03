@@ -25,6 +25,7 @@
                         "inlet":                "0.2.6",
                         "prolific":             "0.0.6",
                         "turnstile":            "0.0.14",
+                        "restrictor":           "0.0.1",
                         "abend":                "0.0.2",
                         "operation":            "0.0.2",
                         "vizsla":               "0.0.6",

@@ -1,7 +1,11 @@
-require('proof')(5, require('cadence')(prove))
+require('proof')(6, require('cadence')(prove))
 
 function prove (async, assert) {
     var bin = require('../../reconfigure.bin'), io
+    var http = require('http')
+    var Semblance = require('semblance')
+    var semblance = new Semblance
+    var server = http.createServer(semblance.dispatch())
     var exec = require('child_process').exec
     var ip
     if (process.env.DOCKER_HOST) {
@@ -31,18 +35,23 @@ function prove (async, assert) {
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
     }, function () {
+        server.listen(4077, '127.0.0.1', async())
+    }, function () {
         io = bin({}, ['serve', '--port=2390', '--etcdaddr=' + ip + ':2379'], {}, async())
     }, function () {
         assert(true, 'running')
-        bin({}, ['set', '127.0.0.1:2390', 'greeting',
-        'Hello World!'], {}, async())
-    }, function () {
-        bin({}, ['list', '127.0.0.1:2390'], {}, async())
-    }, function (values) {
-        assert(values, 'greeting\tHello World!\n', 'key set and retrieved')
-        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
+        bin({}, ['register', '127.0.0.1:2390', 'http://127.0.0.1:4077'], {}, async())
     }, function (ret) {
         assert(ret.success, true, 'registered')
+        bin({}, ['set', '127.0.0.1:2390', 'greeting', 'Hello World!'], {}, async())
+    }, function () {
+        bin({}, ['set', '127.0.0.1:2390', 'greeting2', 'Hello World!'], {}, async())
+    }, function () {
+        assert(semblance.shift().body.properties, { greeting: 'Hello World!'},
+        'listener updated')
+        bin({}, ['list', '127.0.0.1:2390'], {}, async())
+    }, function (values) {
+        assert(values, 'greeting\tHello World!\ngreeting2\tHello World!\n', 'key set and retrieved')
        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.extant, true, 'duplicant registry')
@@ -50,5 +59,6 @@ function prove (async, assert) {
     }, function (ret) {
         assert(ret.success, true, 'deregistered')
         io.events.emit('SIGINT')
+        server.close()
     })
 }

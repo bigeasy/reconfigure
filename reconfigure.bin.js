@@ -45,6 +45,7 @@ var Coordinator = require('./reconfigure/coordinator')
 var Consensus = require('./reconfigure/consensus')
 var UserAgent = require('./reconfigure/ua')
 var Vizsla = require('vizsla')
+var abend = require('abend')
 
 require('arguable')(module, require('cadence')(function (async, options) {
     var reconfigure, coord, etcdport, server
@@ -62,19 +63,25 @@ require('arguable')(module, require('cadence')(function (async, options) {
             async(function () {
                 coord = new Coordinator(
                     new Consensus(
-                        options.param.ip, // switch to key
+                        options.param.ip + options.param.port,
                         etcd.split(':')[0],
                         etcd.split(':')[1],
-                        function () {console.log('panic')} //panic
+                        function (callback) {
+                            coord.update(callback)
+                        }
                     ),
                     new UserAgent()
                 )
-            }, function () {
                 coord._consensus.initialize(async())
+            }, function () {
+                coord._consensus.watch(abend)
             }, function () {
                 var reconfigure = new Reconfigure(coord)
                 var server = http.createServer(reconfigure.dispatcher().server())
-                options.signal('SIGINT', function () { server.close() })
+                options.signal('SIGINT', function () {
+                    server.close()
+                    coord._consensus.stop()
+                })
                 server.listen(options.param.port, options.param.ip, async())
             })
             break
@@ -88,7 +95,7 @@ require('arguable')(module, require('cadence')(function (async, options) {
                     key: options.argv[1],
                     value: options.argv[2]
                 }
-                }, async())
+            }, async())
             break
 
         case 'list':
@@ -107,7 +114,7 @@ require('arguable')(module, require('cadence')(function (async, options) {
             })
             break
 
-        case 'registerd':
+        case 'registered':
             break
 
         case 'register':
@@ -133,7 +140,6 @@ require('arguable')(module, require('cadence')(function (async, options) {
             break
 
         case 'stop':
-            server.close()
             break
         }
 }))
