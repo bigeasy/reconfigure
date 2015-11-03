@@ -64,6 +64,11 @@ function prove (async, assert) {
         coordinator.retry(async()) // test retry
     }, function () {
         assert(coordinator._failed, {}, 'retried')
+        ua.added = false
+        coordinator._failed['127.0.0.1:8081'] = true // screw up the state and
+                                                     // retry, should be ok
+        coordinator.retry(async()) // test retry
+    }, function () {
         coordinator.unlisten('127.0.0.1:8081', async())
     }, function (unlisten) {
         assert(unlisten, true, 'unlisten on 8081')
