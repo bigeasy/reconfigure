@@ -31,9 +31,8 @@ function prove (async, assert) {
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
     }, function () {
-        var wait
-        var consensus = new Consensus('test', ip, '2379', function (properties, callback) {
-            consensus.list(wait)
+        var consensus = new Consensus('test', ip, '2379', function (callback) {
+            callback(null)
         })
         async(function () {
             consensus.initialize(async())
@@ -73,12 +72,15 @@ function prove (async, assert) {
                 consensus.watch(abend)
                 setTimeout(async(), 2500)
             }, function () {
-                wait = async()
-                consensus.set('foo', 'blat', async()) // can't truly `watch` and `set`
-                                                      // at the same time. this
-                                                      // just ensures
-                                                      // consensus._list is
-                                                      // updated.
+                async(function () {
+                    consensus.set('foo', 'blat', async()) // can't truly `watch` and `set`
+                                                          // at the same time. this
+                                                          // just ensures
+                                                          // consensus._list is
+                                                          // updated.
+                }, function () {
+                    consensus.list(async())
+                })
             }, function (list) {
                 assert(list, {'foo':'blat','fro':'bar','frr':'bar','for':'bar'}, 'list updated')
                 consensus.stop()

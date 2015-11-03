@@ -97,7 +97,6 @@ Consensus.prototype.list = cadence(function (async) {
 })
 
 Consensus.prototype._changed = restrict(cadence(function (async) {
-    console.log('changed')
     this._listener.apply([ async() ]) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
         // up in the next tick queue?
@@ -108,7 +107,6 @@ Consensus.prototype._changed = restrict(cadence(function (async) {
 Consensus.prototype.watch = cadence(function (async) {
     this._watcher = this._etcd.watcher('/reconfigure/properties', null, { recursive: true })
     new Delta(async()).ee(this._watcher).on('change', function (whatIsThis) {
-        //console.log(whatIsThis)
         // ^^^ change
         this._changed(abend)
     }.bind(this)).on('stop')

@@ -40,16 +40,18 @@ function prove (async, assert) {
         io = bin({}, ['serve', '--port=2390', '--etcdaddr=' + ip + ':2379'], {}, async())
     }, function () {
         assert(true, 'running')
-        bin({}, ['register', '127.0.0.1:2390', '127.0.0.1:4077'], {}, async())
+        bin({}, ['register', '127.0.0.1:2390', 'http://127.0.0.1:4077'], {}, async())
     }, function (ret) {
         assert(ret.success, true, 'registered')
         bin({}, ['set', '127.0.0.1:2390', 'greeting', 'Hello World!'], {}, async())
+    }, function () {
+        bin({}, ['set', '127.0.0.1:2390', 'greeting2', 'Hello World!'], {}, async())
     }, function () {
         var got = semblance.shift()
         console.log(got)
         bin({}, ['list', '127.0.0.1:2390'], {}, async())
     }, function (values) {
-        assert(values, 'greeting\tHello World!\n', 'key set and retrieved')
+        assert(values, 'greeting\tHello World!\ngreeting2\tHello World!\n', 'key set and retrieved')
        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.extant, true, 'duplicant registry')
