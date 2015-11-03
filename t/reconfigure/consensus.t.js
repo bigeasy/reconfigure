@@ -33,7 +33,7 @@ function prove (async, assert) {
     }, function () {
         var wait, consensus = new Consensus('test', ip, '2379', function (callback) {
             assert(true, 'listener called')
-            callback(null)
+            callback()
             wait()
         })
         async(function () {
