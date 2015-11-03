@@ -68,4 +68,8 @@ Coordinator.prototype.set = cadence(function (async, key, value) {
     this._consensus.set(key, value, async())
 })
 
+Coordinator.prototype.listeners = cadence(function (async) {
+    this._consensus.listeners(async())
+})
+
 module.exports = Coordinator
