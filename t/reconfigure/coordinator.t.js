@@ -47,8 +47,8 @@ function prove (async, assert) {
         assert(listening, true, 'listen on 8081')
     }, function () {
         coordinator.listen('127.0.0.1:8081', async())
-    }, function (listening) {
-        assert(listening, false, 'no dupes')
+    }, function (extant) {
+        assert(extant, true, 'no dupes')
     }, function () {
         coordinator.update(async())
     }, function (updated) {

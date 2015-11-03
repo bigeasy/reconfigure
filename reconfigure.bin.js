@@ -1,13 +1,13 @@
 /*
-    ___ usage ___ en_US ___
-    usage: node reconfigure.bin.js
+    ___ serve, usage ___ en_US ___
+    usage: node reconfigure.bin.js serve <args>
 
         -i, --ip        <string>    address to bind to
         -p, --port      <integer>   port to bind to
         -l, --log       <string>    path to a log file
+        -e, --etcdaddr <string>    etcd address and port
             --help                  display this message
-
-    ___ $ ___ en_US ___
+    ___ serve, $ ___ en_US ___
 
         first is required:
             error: the `--first` URL is a required argument
@@ -24,6 +24,18 @@
         port is not integer:
             the `--port` must be an integer
 
+    ___ set, usage ___ en_US ___
+    usage: node reconfigure.bin.js set [address] [key] [value] <args>
+
+    ___ list, usage ___ en_US ___
+    usage: node reconfigure.bin.js list <args>
+
+    ___ register, usage ___ en_US ___
+    usage: node reconfigure.bin.js register <args>
+
+    ___ deregister, usage ___ en_US ___
+    usage: node reconfigure.bin.js deregister <args>
+
     ___ . ___
 */
 
@@ -32,37 +44,96 @@ var http = require('http')
 var Coordinator = require('./reconfigure/coordinator')
 var Consensus = require('./reconfigure/consensus')
 var UserAgent = require('./reconfigure/ua')
+var Vizsla = require('vizsla')
 
 require('arguable')(module, require('cadence')(function (async, options) {
-    var reconfigure, coord
+    var reconfigure, coord, etcdport, server
+    var ua = new Vizsla()
     options.helpIf(options.param.help)
-//    options.required('ip')
-
     options.param.ip || (options.param.ip = '127.0.0.1')
+    options.param.etcdaddr || (options.param.etcdaddr = '127.0.0.1:2379')
     options.param.port || (options.param.port = 8080)
 
     options.validate('%s is not integer', 'port', /^\d+$/)
+    var etcd = options.param.etcdaddr
 
-    /*
-    async(function () {
-        async(function () {
-            coord = new Coordinator(
-                new Consensus(
-                    options.param.ip, // switch to key
-                    options.param.ip,
-                    options.param.port,
-                    async()
-                ),
-                new UserAgent()
-            )
-        }, function () {
-            // panic
-        })
-    }, function () {
-    */
-        var reconfigure = new Reconfigure
-        var server = http.createServer(reconfigure.dispatcher().server())
-        options.signal('SIGINT', function () { server.close() })
-        server.listen(options.param.port, options.param.address, async())
-    //})
+    switch (options.command[0]) {
+        case 'serve':
+            async(function () {
+                coord = new Coordinator(
+                    new Consensus(
+                        options.param.ip, // switch to key
+                        etcd.split(':')[0],
+                        etcd.split(':')[1],
+                        function () {console.log('panic')} //panic
+                    ),
+                    new UserAgent()
+                )
+            }, function () {
+                coord._consensus.initialize(async())
+            }, function () {
+                var reconfigure = new Reconfigure(coord)
+                var server = http.createServer(reconfigure.dispatcher().server())
+                options.signal('SIGINT', function () { server.close() })
+                server.listen(options.param.port, options.param.ip, async())
+            })
+            break
+
+        case 'set':
+            ua.fetch({
+                url: 'http://' + options.argv[0]
+            }, {
+                url: '/set',
+                post: {
+                    key: options.argv[1],
+                    value: options.argv[2]
+                }
+                }, async())
+            break
+
+        case 'list':
+            async(function () {
+                ua.fetch({
+                    url: 'http://' + options.argv[0]
+                }, {
+                    url: '/list'
+                }, async())
+            }, function (list) {
+                var s = ''
+                for (var v in list.values) {
+                    s += v + '\t' + list.values[v] + '\n'
+                }
+                return s
+            })
+            break
+
+        case 'registerd':
+            break
+
+        case 'register':
+            ua.fetch({
+                    url: 'http://' + options.argv[0]
+            }, {
+                url: '/register',
+                post: {
+                    url: options.argv[1]
+                }
+            }, async())
+            break
+
+        case 'deregister':
+            ua.fetch({
+                    url: 'http://' + options.argv[0]
+            }, {
+                url: '/register',
+                post: {
+                    url: options.argv[1]
+                }
+            }, async())
+            break
+
+        case 'stop':
+            server.close()
+            break
+        }
 }))
