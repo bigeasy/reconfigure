@@ -63,14 +63,18 @@ require('arguable')(module, require('cadence')(function (async, options) {
             async(function () {
                 coord = new Coordinator(
                     new Consensus(
-                        options.param.ip, // switch to key
+                        'dummy_key', // switch to key
                         etcd.split(':')[0],
                         etcd.split(':')[1],
-                        function () { coord.update() }
+                        function () {
+                            async(function () {
+                                coord.update(async())
+                            })
+                        }
                     ),
                     new UserAgent()
                 )
-                coord._consensus.watch(abend)
+                coord._consensus.watch(abend) // switch with below after working
             }, function () {
                 coord._consensus.initialize(async())
             }, function () {
