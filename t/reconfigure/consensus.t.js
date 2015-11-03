@@ -1,4 +1,4 @@
-require('proof')(6, require('cadence')(prove))
+require('proof')(7, require('cadence')(prove))
 function prove (async, assert) {
     var Consensus = require('../../reconfigure/consensus')
     var exec = require('child_process').exec
@@ -32,6 +32,7 @@ function prove (async, assert) {
              -initial-cluster-state new', async())
     }, function () {
         var consensus = new Consensus('test', ip, '2379', function (callback) {
+            assert(true, 'listener called')
             callback(null)
         })
         async(function () {
