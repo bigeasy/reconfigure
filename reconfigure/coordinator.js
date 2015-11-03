@@ -51,7 +51,7 @@ Coordinator.prototype.retry = cadence(function (async) {
         this._consensus.listeners(async())
     }, function (list, listeners) {
         async.forEach(function (url) {
-            if (listeners.indexOf(url) != -1) {
+            if (listeners[0].indexOf(url) != -1) {
                 async(function () {
                     this._ua.update(url, list, async())
                 }, function (ok) {

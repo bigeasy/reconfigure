@@ -1,4 +1,4 @@
-require('proof')(4, require('cadence')(prove))
+require('proof')(6, require('cadence')(prove))
 
 function prove (async, assert) {
     var Coordinator = require('../../reconfigure/coordinator')
@@ -24,7 +24,7 @@ function prove (async, assert) {
             callback(null, true)
         },
         listeners: function (callback) {
-            callback(null, [['127.0.0.1:4077']])
+            callback(null, [['127.0.0.1:8081']])
         },
         list: function (callback) {
             callback(null, { key: 'a val', anotherkey: 'a val' })
@@ -32,8 +32,12 @@ function prove (async, assert) {
     }
 
     var ua = {
+        added: false,
         update: function (url, properties, callback) {
-            callback(null, true)
+            if (!this.added) {
+                callback(null, false)
+                this.added = true
+            } else { callback(null, true) }
         }
     }
 
@@ -49,10 +53,17 @@ function prove (async, assert) {
         coordinator.listen('127.0.0.1:8081', async())
     }, function (extant) {
         assert(extant, true, 'no dupes')
+        coordinator.retry(async()) //empty run for coverage
     }, function () {
-        coordinator.update(async())
+        coordinator.update(async()) // fail so we can retry
+    }, function () {
+        assert(coordinator._failed, { '127.0.0.1:8081': true }, 'waiting to retry')
+        coordinator.update(async()) // test update
     }, function (updated) {
         assert(updated, true, 'updated')
+        coordinator.retry(async()) // test retry
+    }, function () {
+        assert(coordinator._failed, {}, 'retried')
         coordinator.unlisten('127.0.0.1:8081', async())
     }, function (unlisten) {
         assert(unlisten, true, 'unlisten on 8081')
