@@ -1,4 +1,4 @@
-require('proof')(5, require('cadence')(prove))
+require('proof')(6, require('cadence')(prove))
 
 function prove (async, assert) {
     var bin = require('../../reconfigure.bin'), io
@@ -47,8 +47,8 @@ function prove (async, assert) {
     }, function () {
         bin({}, ['set', '127.0.0.1:2390', 'greeting2', 'Hello World!'], {}, async())
     }, function () {
-        var got = semblance.shift()
-        console.log(got)
+        assert(semblance.shift().body.properties, { greeting: 'Hello World!'},
+        'listener updated')
         bin({}, ['list', '127.0.0.1:2390'], {}, async())
     }, function (values) {
         assert(values, 'greeting\tHello World!\ngreeting2\tHello World!\n', 'key set and retrieved')
