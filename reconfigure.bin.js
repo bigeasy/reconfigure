@@ -36,6 +36,9 @@
     ___ deregister, usage ___ en_US ___
     usage: node reconfigure.bin.js deregister <args>
 
+    ___ registered, usage ___ en_US ___
+    usage: node reconfigure.bin.js registered <args>
+
     ___ . ___
 */
 

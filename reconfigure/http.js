@@ -65,4 +65,12 @@ Reconfigure.prototype.list = cadence(function (async) {
     })
 })
 
+Reconfigure.prototype.registered = cadence(function (async) {
+    async(function () {
+        this._coordinator.listeners(async())
+    }, function (list) {
+        return { listeners: list }
+    })
+})
+
 module.exports = Reconfigure

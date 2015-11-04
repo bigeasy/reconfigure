@@ -61,6 +61,8 @@ function prove (async, assert) {
         bin({}, ['deregister', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.success, true, 'deregistered')
+        bin({}, ['registered', '127.0.0.1:2390'], {}, async())
+    }, function (ret) {
         io.events.emit('SIGINT')
         server.close()
     })
