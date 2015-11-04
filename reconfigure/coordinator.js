@@ -9,11 +9,11 @@ function Coordinator (consensus, ua) {
 Coordinator.prototype.listen = cadence(function (async, url) { // <- listen, POST, -> get them started
     async(function () {
         this._consensus.addListener(url, async())
-    }, function (act) {
-        if (act) {
-            return (act.node.value == url)
+    }, function (success, dupe) {
+        return {
+            success: success,
+            duplicate: dupe
         }
-        return true
     })
 })
 

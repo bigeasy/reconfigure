@@ -43,7 +43,21 @@ Consensus.prototype.addListener = cadence(function (async, url) {
         }
         return true
     }, function (set) {
-        if (set) this._etcd.set(this._directory + '/' + Date.now(), url, async())
+        if (set) {
+            this._etcd.set(this._directory + '/' + Date.now(), url, async())
+        } else {
+            return {
+                dupe: !set,
+                set: false
+            }
+        }
+    }, function (act) {
+        // if set, double-check URL
+        if (act.node) {
+            return [ true, (act.node.value == url) ]
+        }
+
+        return [ act.set, act.dupe ]
     })
 })
 

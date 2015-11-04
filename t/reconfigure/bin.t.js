@@ -51,7 +51,10 @@ function prove (async, assert) {
         'listener updated')
         bin({}, ['list', '127.0.0.1:2390'], {}, async())
     }, function (values) {
-        assert(values, 'greeting\tHello World!\ngreeting2\tHello World!\n', 'key set and retrieved')
+        assert((values.indexOf('greeting\tHello World!\n') != -1) &&
+        (values.indexOf('greeting2\tHello World!\n') != -1), true, 'key set and retrieved')
+       bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
+    }, function () {
        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.extant, true, 'duplicant registry')

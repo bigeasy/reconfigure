@@ -115,6 +115,15 @@ require('arguable')(module, require('cadence')(function (async, options) {
             break
 
         case 'registered':
+            async(function () {
+                ua.fetch({
+                    url: 'http://' + options.argv[0]
+                }, {
+                    url: '/registered'
+                }, async())
+            }, function (list) {
+                return list.listeners
+            })
             break
 
         case 'register':

@@ -7,10 +7,16 @@ function prove (async, assert) {
         listeners: [],
         listen: function (url, callback) {
             if (this.listeners.indexOf(url) > -1) {
-                callback(null, true)
+                callback(null, {
+                    duplicate: true,
+                    success: true
+                })
             } else {
                 this.listeners.push(url)
-                callback(null, false)
+                callback(null, {
+                    success: false,
+                    duplicate: false
+                })
             }
         },
 
