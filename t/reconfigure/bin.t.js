@@ -1,4 +1,4 @@
-require('proof')(6, require('cadence')(prove))
+require('proof')(7, require('cadence')(prove))
 
 function prove (async, assert) {
     var bin = require('../../reconfigure.bin'), io
@@ -63,6 +63,7 @@ function prove (async, assert) {
         assert(ret.success, true, 'deregistered')
         bin({}, ['registered', '127.0.0.1:2390'], {}, async())
     }, function (ret) {
+        assert(ret, 'http://127.0.0.1:4077', 'registry listed')
         io.events.emit('SIGINT')
         server.close()
     })
