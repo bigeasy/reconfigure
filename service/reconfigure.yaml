@@ -6,14 +6,18 @@ metadata:
     app: reconfigure
 spec:
   containers:
+  - name: reconfigure-etcd
+    image: shift/coreos-ubuntu-etcd
+    #command: ["etcd", "--advertise-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001", "--listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001", "--data-dir /data/reconfigure/reconfigure.data"]
+    command: ["etcd"]
   - name: reconfigure
     image: demarius/test
-  - name: reconfigure-etcd
-    image: quay.io/coreos/etcd
-    command: ["/usr/local/bin/etcd", "-advertise-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001," "-listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001", "-data-dir /data/reconfigure/reconfigure.data"]
+    ports:
+    - name: api
+      containerPort: 4077
     volumeMounts:
-    - name: reconfigure.data
+    - name: reconfigure-etcd-data
       mountPath: /data/reconfigure/
-  - volumes:
-    - name: reconfigure-etcd
+  volumes:
+    - name: reconfigure-etcd-data
       emptyDir: {}
