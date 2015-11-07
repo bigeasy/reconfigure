@@ -8,7 +8,7 @@ spec:
   containers:
   - name: reconfigure-etcd
     image: shift/coreos-ubuntu-etcd
-    command: ["etcd", "--advertise-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001", "--listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001"]
+    command: ["etcd", "--advertise-client-urls", "http://0.0.0.0:2379,http://0.0.0.0:4001", "--listen-client-urls", "http://0.0.0.0:2379,http://0.0.0.0:4001"]
     volumeMounts:
     - name: reconfigure-etcd-data
       mountPath: /data/reconfigure/
