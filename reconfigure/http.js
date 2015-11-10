@@ -12,6 +12,7 @@ Reconfigure.prototype.dispatcher = function (options) {
     dispatcher.dispatch('GET /', 'index')
     dispatcher.dispatch('POST /register', 'register')
     dispatcher.dispatch('POST /deregister', 'deregister')
+    dispatcher.dispatch('GET /registered', 'registered')
     dispatcher.dispatch('POST /set', 'set')
     dispatcher.dispatch('GET /list', 'list')
     return dispatcher.createDispatcher()
@@ -24,9 +25,9 @@ Reconfigure.prototype.index = cadence(function (async) {
 Reconfigure.prototype.register = cadence(function (async, post) {
     async(function () {
         this._coordinator.listen(post.body.url, async())
-    }, function (dupe) {
+    }, function (res) {
         return {
-            extant: dupe,
+            extant: res.duplicate,
             url: post.body.url,
             success: true
         }
@@ -63,4 +64,13 @@ Reconfigure.prototype.list = cadence(function (async) {
         return { values: list }
     })
 })
+
+Reconfigure.prototype.registered = cadence(function (async) {
+    async(function () {
+        this._coordinator.listeners(async())
+    }, function (list) {
+        return { listeners: list }
+    })
+})
+
 module.exports = Reconfigure

@@ -1,4 +1,4 @@
-require('proof')(6, require('cadence')(prove))
+require('proof')(7, require('cadence')(prove))
 
 function prove (async, assert) {
     var bin = require('../../reconfigure.bin'), io
@@ -51,13 +51,19 @@ function prove (async, assert) {
         'listener updated')
         bin({}, ['list', '127.0.0.1:2390'], {}, async())
     }, function (values) {
-        assert(values, 'greeting\tHello World!\ngreeting2\tHello World!\n', 'key set and retrieved')
+        assert((values.indexOf('greeting\tHello World!\n') != -1) &&
+        (values.indexOf('greeting2\tHello World!\n') != -1), true, 'key set and retrieved')
+       bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
+    }, function () {
        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.extant, true, 'duplicant registry')
         bin({}, ['deregister', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.success, true, 'deregistered')
+        bin({}, ['registered', '127.0.0.1:2390'], {}, async())
+    }, function (ret) {
+        assert(ret, 'http://127.0.0.1:4077', 'registry listed')
         io.events.emit('SIGINT')
         server.close()
     })

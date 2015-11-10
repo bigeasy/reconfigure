@@ -1,4 +1,4 @@
-require('proof')(6, require('cadence')(prove))
+require('proof')(8, require('cadence')(prove))
 
 function prove (async, assert) {
     var Coordinator = require('../../reconfigure/coordinator')
@@ -10,14 +10,10 @@ function prove (async, assert) {
         },
         addListener: function (url, callback) {
             if (this.added) {
-                callback(null, false)
+                callback(null, false, true)
             } else {
                 this.added = true
-                callback(null, {
-                    node: {
-                        value: url
-                    }
-                })
+                callback(null, true, false)
             }
         },
         removeListener: function (url, callback) {
@@ -48,11 +44,16 @@ function prove (async, assert) {
     }, function () {
         coordinator.listen('127.0.0.1:8081', async())
     }, function (listening) {
-        assert(listening, true, 'listen on 8081')
+        assert(listening.success, true, 'listen on 8081')
     }, function () {
         coordinator.listen('127.0.0.1:8081', async())
-    }, function (extant) {
-        assert(extant, true, 'no dupes')
+    }, function (listening) {
+        assert(listening.duplicate, true, 'dupe registry attempt')
+        assert(listening.success, false, 'no dupes')
+    }, function () {
+        coordinator.listeners('127.0.0.1:8081', async())
+    }, function (list) {
+        assert(list[0][0], '127.0.0.1:8081', 'got registry')
         coordinator.retry(async()) //empty run for coverage
     }, function () {
         coordinator.update(async()) // fail so we can retry

@@ -36,6 +36,9 @@
     ___ deregister, usage ___ en_US ___
     usage: node reconfigure.bin.js deregister <args>
 
+    ___ registered, usage ___ en_US ___
+    usage: node reconfigure.bin.js registered <args>
+
     ___ . ___
 */
 
@@ -115,6 +118,15 @@ require('arguable')(module, require('cadence')(function (async, options) {
             break
 
         case 'registered':
+            async(function () {
+                ua.fetch({
+                    url: 'http://' + options.argv[0]
+                }, {
+                    url: '/registered'
+                }, async())
+            }, function (list) {
+                return list.listeners
+            })
             break
 
         case 'register':
