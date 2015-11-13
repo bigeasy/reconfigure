@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: reconfigure
+  labels:
+    app: reconfigure
+spec:
+  containers:
+  - name: reconfigure-etcd
+    image: shift/coreos-ubuntu-etcd
+    #command: ["etcd", "--advertise-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001", "--listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001", "--data-dir /data/reconfigure/reconfigure-etcd-data"]
+    command: ["etcd"]
+  - name: reconfigure
+    image: demarius/test
+    ports:
+    - name: api
+      containerPort: 4077
+    volumeMounts:
+    - name: reconfigure-etcd-data
+      mountPath: /data/reconfigure/
+  volumes:
+    - name: reconfigure-etcd-data
+      emptyDir: {}

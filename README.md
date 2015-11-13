@@ -9,7 +9,7 @@ server and Reconfigure.
 
 `reconfigure register 127.0.0.1:8080 http://54.10.58.4:2333/some-endpoint` registers
 the url `http://54.10.58.4:2333/some-endpoint` for updates. `reconfigure deregister`
-is similar.
+is similar. `reconfigure registered` returns registered endpoints.
 
 `reconfigure set 127.0.0.1:8080 key value` sets an etcd `key` to `value`.
 
