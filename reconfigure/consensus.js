@@ -12,6 +12,7 @@ function Consensus (key, host, port, listener) {
     this._directory = '/reconfigure/listeners/' + key
     this._listener = new Operation(listener) // <- asynchronous function, if we get an error we panic.
     this._turnstile = new turnstile.Turnstile
+    this._reactor = new Reactor(this._listener)
 }
 
 Consensus.prototype.initialize = cadence(function (async) {
