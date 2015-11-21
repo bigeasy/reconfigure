@@ -5,6 +5,7 @@ var abend = require('abend')
 var Operation = require('operation')
 var restrict = require('restrictor')
 var turnstile = require('turnstile')
+var Reactor = require('reactor')
 
 function Consensus (key, host, port, listener) {
     this._etcd = new Etcd(host, port)
@@ -124,6 +125,8 @@ Consensus.prototype.watch = cadence(function (async) {
     new Delta(async()).ee(this._watcher).on('change', function (whatIsThis) {
         // ^^^ change
         this._changed(abend)
+        //this._reactor.push() Figure out where/how to push a change onto the
+        //queue.
     }.bind(this)).on('stop')
 })
 
