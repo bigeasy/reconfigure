@@ -69,7 +69,7 @@ require('arguable')(module, require('cadence')(function (async, options) {
                         options.param.ip + options.param.port,
                         etcd.split(':')[0],
                         etcd.split(':')[1],
-                        function (callback) {
+                        function (status, key, callback) {
                             coord.update(callback)
                         }
                     ),

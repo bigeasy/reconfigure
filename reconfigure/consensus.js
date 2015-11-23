@@ -4,16 +4,16 @@ var Delta = require('delta')
 var abend = require('abend')
 var Operation = require('operation')
 var restrict = require('restrictor')
-var turnstile = require('turnstile')
+var Turnstile = require('turnstile')
 var Reactor = require('reactor')
 
 function Consensus (key, host, port, listener) {
     this._etcd = new Etcd(host, port)
     this._watcher = null
     this._directory = '/reconfigure/listeners/' + key
-    this._listener = new Operation(listener) // <- asynchronous function, if we get an error we panic.
-    this._turnstile = new turnstile.Turnstile
-    this._reactor = new Reactor(this._listener)
+    //this._listener = new Operation(listener) // <- asynchronous function, if we get an error we panic.
+    this._turnstile = new Turnstile({ workers: 1})
+    this._reactor = new Reactor(listener, this._turnstile)
 }
 
 Consensus.prototype.initialize = cadence(function (async) {
@@ -112,20 +112,20 @@ Consensus.prototype.list = cadence(function (async) {
     })
 })
 
-Consensus.prototype._changed = restrict(cadence(function (async) {
+Consensus.prototype._changed = cadence(function (async) {
     this._listener.apply([ async() ]) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
         // up in the next tick queue?
         // ^^^ should, we don't know how, use Cadence exceptions to do the right
         // thing.
-}))
+})
 
 Consensus.prototype.watch = cadence(function (async) {
     this._watcher = this._etcd.watcher('/reconfigure/properties', null, { recursive: true })
-    new Delta(async()).ee(this._watcher).on('change', function (whatIsThis) {
+    new Delta(async()).ee(this._watcher).on('change', function (op) {
         // ^^^ change
-        this._changed(abend)
-        //this._reactor.push() Figure out where/how to push a change onto the
+        //this._changed(abend)
+        this._reactor.push(op.node.key + op.node.value) //Figure out where/how to push a change onto the
         //queue.
     }.bind(this)).on('stop')
 })
