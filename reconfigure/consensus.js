@@ -125,7 +125,7 @@ Consensus.prototype.watch = cadence(function (async) {
     new Delta(async()).ee(this._watcher).on('change', function (op) {
         // ^^^ change
         //this._changed(abend)
-        this._reactor.push(op.node.key + op.node.value) //Figure out where/how to push a change onto the
+        this._reactor.check()
         //queue.
     }.bind(this)).on('stop')
 })
