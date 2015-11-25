@@ -11,7 +11,10 @@ function Consensus (key, host, port, listener) {
     this._watcher = null
     this._directory = '/reconfigure/listeners/' + key
     this._turnstile = new Turnstile({ workers: 1})
-    this._reactor = new Reactor(listener, this._turnstile)
+    this._reactor = new Reactor(function (status, callback) {
+        console.log(arguments)
+        listener(null, callback)
+    }, this._turnstile)
 }
 
 Consensus.prototype.initialize = cadence(function (async) {
@@ -111,7 +114,7 @@ Consensus.prototype.list = cadence(function (async) {
 })
 
 Consensus.prototype._changed = cadence(function (async) {
-    this._listener.apply([ async() ]) // <- error -> panic!
+    this.listener.apply([ async() ]) // <- error -> panic!
         // todo: what if there's a synchronous error? Are we going to stack them
         // up in the next tick queue?
         // ^^^ should, we don't know how, use Cadence exceptions to do the right
