@@ -2,7 +2,6 @@ var Etcd = require('node-etcd')
 var cadence = require('cadence')
 var Delta = require('delta')
 var abend = require('abend')
-var Operation = require('operation')
 var restrict = require('restrictor')
 var Turnstile = require('turnstile')
 var Reactor = require('reactor')
@@ -11,7 +10,6 @@ function Consensus (key, host, port, listener) {
     this._etcd = new Etcd(host, port)
     this._watcher = null
     this._directory = '/reconfigure/listeners/' + key
-    //this._listener = new Operation(listener) // <- asynchronous function, if we get an error we panic.
     this._turnstile = new Turnstile({ workers: 1})
     this._reactor = new Reactor(listener, this._turnstile)
 }
