@@ -1,6 +1,7 @@
 require('proof')(7, require('cadence')(prove))
 
 function prove (async, assert) {
+    var cadence = require('cadence')
     var bin = require('../../reconfigure.bin'), io
     var http = require('http')
     var Semblance = require('semblance')
@@ -17,23 +18,31 @@ function prove (async, assert) {
         })[0].address
     }
 
-    async([function () {
-        async(function () {
+    var dock = cadence(function (async) {
+        async([function () {
             exec('docker kill reconfigure-etcd', async())
-        }, function () {
+        }, /kill/, function (error) {
+            console.log('errorrrrr')
+        }], [function () {
             exec('docker rm reconfigure-etcd', async())
-        })
+        }, /running/, function (error) {
+            console.log('errorrrrr')
+        }])
+    })
+
+    async([function () {
+        dock(async())
     }], function () {
-        exec('docker run -d -p 4001:4001 -p 2380:2380 -p 2379:2379 \
-             --name reconfigure-etcd quay.io/coreos/etcd \
-             -name reconfigure-etcd \
-             -advertise-client-urls http://' + ip + ':2379,http://' + ip + ':4001 \
-             -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
-             -initial-advertise-peer-urls http://' + ip + ':2380 \
-             -listen-peer-urls http://0.0.0.0:2380 \
-             -initial-cluster-token etcd-cluster-1 \
-             -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
-             -initial-cluster-state new', async())
+            exec('docker run -d -p 4001:4001 -p 2380:2380 -p 2379:2379 \
+                 --name reconfigure-etcd quay.io/coreos/etcd \
+                 -name reconfigure-etcd \
+                 -advertise-client-urls http://' + ip + ':2379,http://' + ip + ':4001 \
+                 -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
+                 -initial-advertise-peer-urls http://' + ip + ':2380 \
+                 -listen-peer-urls http://0.0.0.0:2380 \
+                 -initial-cluster-token etcd-cluster-1 \
+                 -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
+                 -initial-cluster-state new', async())
     }, function () {
         server.listen(4077, '127.0.0.1', async())
     }, function () {
