@@ -31,7 +31,7 @@ function prove (async, assert) {
              -initial-cluster reconfigure-etcd=http://' + ip + ':2380 \
              -initial-cluster-state new', async())
     }, function () {
-        var wait, consensus = new Consensus('test', ip, '2379', function (status, key, callback) {
+        var wait, consensus = new Consensus('test', ip, '2379', function (e, callback) {
             assert(true, 'listener called')
             callback()
             wait()

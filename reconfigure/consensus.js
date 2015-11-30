@@ -11,9 +11,8 @@ function Consensus (key, host, port, listener) {
     this._watcher = null
     this._directory = '/reconfigure/listeners/' + key
     this._turnstile = new Turnstile({ workers: 1})
-    this._reactor = new Reactor(function (status, callback) {
-        console.log(arguments)
-        listener(null, callback)
+    this._reactor = new Reactor(function () {
+        listener.apply(this, [].slice.call(arguments))
     }, this._turnstile)
 }
 

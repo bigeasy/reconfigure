@@ -55,6 +55,7 @@ function prove (async, assert) {
         bin({}, ['set', '127.0.0.1:2390', 'greeting', 'Hello World!'], {}, async())
     }, function () {
         bin({}, ['set', '127.0.0.1:2390', 'greeting2', 'Hello World!'], {}, async())
+        setTimeout(async(), 2500)
     }, function () {
         assert(semblance.shift().body.properties, { greeting: 'Hello World!'},
         'listener updated')
