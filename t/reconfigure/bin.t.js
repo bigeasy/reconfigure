@@ -1,6 +1,7 @@
 require('proof')(7, require('cadence')(prove))
 
 function prove (async, assert) {
+    var cadence = require('cadence')
     var bin = require('../../reconfigure.bin'), io
     var http = require('http')
     var Semblance = require('semblance')
@@ -17,12 +18,18 @@ function prove (async, assert) {
         })[0].address
     }
 
-    async([function () {
-        async(function () {
+    var dock = cadence(function (async) {
+        async([function () {
             exec('docker kill reconfigure-etcd', async())
-        }, function () {
+        }, /kill/, function (error) {
+        }], [function () {
             exec('docker rm reconfigure-etcd', async())
-        })
+        }, /running/, function (error) {
+        }])
+    })
+
+    async([function () {
+        dock(async())
     }], function () {
         exec('docker run -d -p 4001:4001 -p 2380:2380 -p 2379:2379 \
              --name reconfigure-etcd quay.io/coreos/etcd \
@@ -46,6 +53,7 @@ function prove (async, assert) {
         bin({}, ['set', '127.0.0.1:2390', 'greeting', 'Hello World!'], {}, async())
     }, function () {
         bin({}, ['set', '127.0.0.1:2390', 'greeting2', 'Hello World!'], {}, async())
+        setTimeout(async(), 2500)
     }, function () {
         assert(semblance.shift().body.properties, { greeting: 'Hello World!'},
         'listener updated')
