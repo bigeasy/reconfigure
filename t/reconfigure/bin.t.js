@@ -71,6 +71,7 @@ function prove (async, assert) {
         assert(ret.success, true, 'deregistered')
         bin({}, ['registered', '127.0.0.1:2390'], {}, async())
     }, function (ret) {
+        //bin({}, ['stop'], {}, async()) <-- need to pass for 100%.
         assert(ret, 'http://127.0.0.1:4077', 'registry listed')
         io.events.emit('SIGINT')
         server.close()
