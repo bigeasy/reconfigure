@@ -55,7 +55,9 @@ function prove (async, assert) {
         bin({}, ['set', '127.0.0.1:2390', 'greeting2', 'Hello World!'], {}, async())
         setTimeout(async(), 2500)
     }, function () {
-        assert(semblance.shift().body.properties, { greeting: 'Hello World!'},
+        var data = semblance.shift().body.properties.greeting
+        console.log(data)
+        assert(data, 'Hello World!',
         'listener updated')
         bin({}, ['list', '127.0.0.1:2390'], {}, async())
     }, function (values) {
@@ -71,7 +73,6 @@ function prove (async, assert) {
         assert(ret.success, true, 'deregistered')
         bin({}, ['registered', '127.0.0.1:2390'], {}, async())
     }, function (ret) {
-        console.log(arguments)
         //bin({}, ['stop'], {}, async()) <-- need to pass for 100%.
         assert(ret, 'http://127.0.0.1:4077', 'registry listed')
         io.events.emit('SIGINT')
