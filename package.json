@@ -23,6 +23,7 @@
                         "cadence":              "0.4.1",
                         "delta":                "0.0.4",
                         "inlet":                "0.2.6",
+                        "prolific":             "0.0.6",
                         "turnstile":            "0.0.17",
                         "restrictor":           "0.0.1",
                         "abend":                "0.0.2",
