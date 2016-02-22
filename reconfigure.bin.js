@@ -144,7 +144,7 @@ require('arguable')(module, require('cadence')(function (async, options) {
             ua.fetch({
                     url: 'http://' + options.argv[0]
             }, {
-                url: '/register',
+                url: '/deregister',
                 post: {
                     url: options.argv[1]
                 }

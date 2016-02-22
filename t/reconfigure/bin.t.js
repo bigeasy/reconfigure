@@ -56,7 +56,6 @@ function prove (async, assert) {
         setTimeout(async(), 2500)
     }, function () {
         var data = semblance.shift().body.properties.greeting
-        console.log(data)
         assert(data, 'Hello World!',
         'listener updated')
         bin({}, ['list', '127.0.0.1:2390'], {}, async())
@@ -64,7 +63,7 @@ function prove (async, assert) {
         assert(((values.indexOf('greeting\tHello World!\n') > -1) &&
         values.indexOf('greeting2\tHello World!\n') > -1), true, 'key set and retrieved')
        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
-    }, function () {
+    }, function (ret) {
        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.extant, true, 'duplicant registry')
