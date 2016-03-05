@@ -55,14 +55,15 @@ function prove (async, assert) {
         bin({}, ['set', '127.0.0.1:2390', 'greeting2', 'Hello World!'], {}, async())
         setTimeout(async(), 2500)
     }, function () {
-        assert(semblance.shift().body.properties, { greeting: 'Hello World!'},
+        var data = semblance.shift().body.properties.greeting
+        assert(data, 'Hello World!',
         'listener updated')
         bin({}, ['list', '127.0.0.1:2390'], {}, async())
     }, function (values) {
-        assert((values.indexOf('greeting\tHello World!\n') != -1) &&
-        (values.indexOf('greeting2\tHello World!\n') != -1), true, 'key set and retrieved')
+        assert(((values.indexOf('greeting\tHello World!\n') > -1) &&
+        values.indexOf('greeting2\tHello World!\n') > -1), true, 'key set and retrieved')
        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
-    }, function () {
+    }, function (ret) {
        bin({}, ['register', '127.0.0.1:2390', 'blah:4001'], {}, async())
     }, function (ret) {
         assert(ret.extant, true, 'duplicant registry')
@@ -71,6 +72,7 @@ function prove (async, assert) {
         assert(ret.success, true, 'deregistered')
         bin({}, ['registered', '127.0.0.1:2390'], {}, async())
     }, function (ret) {
+        //bin({}, ['stop'], {}, async()) <-- need to pass for 100%.
         assert(ret, 'http://127.0.0.1:4077', 'registry listed')
         io.events.emit('SIGINT')
         server.close()
