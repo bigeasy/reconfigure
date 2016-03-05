@@ -37,6 +37,7 @@ function prove (async, assert) {
             wait()
         })
         async(function () {
+            consensus.stop()
             consensus.initialize(async())
         }, function () {
             consensus.initialize(async())
