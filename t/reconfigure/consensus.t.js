@@ -7,12 +7,14 @@ function prove (async, assert) {
     if (process.env.DOCKER_HOST) {
         ip = /^[^\d]+([\d.]+)/.exec(process.env.DOCKER_HOST)[1]
     } else {
-        console.log(require('os').networkInterfaces())
-        ip = require('os').networkInterfaces().eth0.filter(function (iface) {
-            return iface.family == 'IPv4'
-        })[0].address
+        var interfaces = require('os').networkInterfaces()
+        ip = [].concat.apply([],
+                Object.keys(interfaces).map(function (key) { return interfaces[key] }))
+            .filter(function (iface) {
+                return iface.family == 'IPv4'
+            })[0].address
     }
-    console.log(ip)
+    console.log('Using IPv4 address: ', ip)
     async([function () {
         async(function () {
             exec('docker kill reconfigure-etcd', async())
