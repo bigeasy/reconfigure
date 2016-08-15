@@ -8,10 +8,11 @@ function prove (async, assert) {
         ip = /^[^\d]+([\d.]+)/.exec(process.env.DOCKER_HOST)[1]
     } else {
         var interfaces = require('os').networkInterfaces()
+
         ip = [].concat.apply([],
                 Object.keys(interfaces).map(function (key) { return interfaces[key] }))
             .filter(function (iface) {
-                return iface.family == 'IPv4'
+                return iface.internal ? false : iface.family == 'IPv4'
             })[0].address
     }
     console.log('Using IPv4 address: ', ip)
