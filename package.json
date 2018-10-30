@@ -2,10 +2,10 @@
     "name":             "reconfigure",
     "version":          "0.0.0",
     "author":           "Alan Gutierrez <alan@prettyrobots.com>",
-    "description":      "Consensus driven application configuration.",
+    "description":      "File system watching configuration.",
     "keywords":
     [
-                        "etcd", "consensus", "configuration", "coreos"
+                        "configuration"
     ],
     "contributors":     [],
     "homepage":         "https://github.com/bigeasy/reconfigure",
@@ -19,23 +19,15 @@
     },
     "dependencies":
     {
-                        "arguable":             "0.0.36",
-                        "cadence":              "0.4.1",
-                        "delta":                "0.0.4",
-                        "inlet":                "0.2.6",
-                        "prolific":             "0.0.6",
-                        "turnstile":            "0.0.17",
-                        "restrictor":           "0.0.1",
-                        "abend":                "0.0.2",
-                        "operation":            "0.0.2",
-                        "vizsla":               "0.0.6",
-                        "semblance":            "0.0.4",
-                        "node-etcd":            "4.2.1",
-                        "reactor":              "0.0.9"
+                        "cadence":              "1.0.x",
+                        "demur":                "0.2.x",
+                        "destructible":         "0.34.x",
+                        "prolific.logger":      "8.2.x"
     },
     "devDependencies":
     {
-                        "proof":                "0.0.55"
+                        "fs-extra":             "7.0.0",
+                        "proof":                "3.0.x"
     },
     "scripts":
     {
