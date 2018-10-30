@@ -50,7 +50,7 @@ Reconfigurator.prototype.monitor = cadence(function (async, previous) {
                 }], function () {
                     async([function () {
                         async(function () {
-                            fs.readFile(this._path, 'utf8', async())
+                            fs.readFile(this._path, async())
                         }, function (current) {
                             return this._Comparator.call(null, previous, current)
                         })
@@ -69,7 +69,7 @@ Reconfigurator.prototype.monitor = cadence(function (async, previous) {
                 })
                 async([function () {
                     async(function () {
-                        fs.readFile(this._path, 'utf8', async())
+                        fs.readFile(this._path, async())
                     }, function (current) {
                         return this._Comparator.call(null, previous, current)
                     })
