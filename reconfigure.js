@@ -4,10 +4,10 @@ var delta = require('delta')
 var Demur = require('demur')
 var logger = require('prolific.logger').createLogger('prolific.supervisor')
 var coalesce = require('extant')
-var dirty = require('./dirty')
 
-function Reconfigurator (path) {
+function Reconfigurator (path, Comparator) {
     this._path = path
+    this._Comparator = Comparator
     this._change = null
     this._demur = new Demur({ maximum: 60000, immediate: true })
     this.destroyed = false
@@ -21,7 +21,7 @@ Reconfigurator.prototype.destroy = function () {
     }
 }
 
-Reconfigurator.prototype.monitor = cadence(function (async, contents) {
+Reconfigurator.prototype.monitor = cadence(function (async, previous) {
     this._demur.reset()
     var start = Date.now()
     var loop = async(function () {
@@ -49,7 +49,11 @@ Reconfigurator.prototype.monitor = cadence(function (async, contents) {
                     this._change = null
                 }], function () {
                     async([function () {
-                        dirty(this._path, contents, async())
+                        async(function () {
+                            fs.readFile(this._path, 'utf8', async())
+                        }, function (current) {
+                            return this._Comparator.call(null, previous, current)
+                        })
                     }, function (error) {
                         logger.error('read', {
                             path: this._path,
@@ -64,7 +68,11 @@ Reconfigurator.prototype.monitor = cadence(function (async, contents) {
                     })
                 })
                 async([function () {
-                    dirty(this._path, contents, async())
+                    async(function () {
+                        fs.readFile(this._path, 'utf8', async())
+                    }, function (current) {
+                        return this._Comparator.call(null, previous, current)
+                    })
                 }, function (error) {
                     return true
                 }], function (dirty) {

@@ -25,7 +25,7 @@ function prove (okay, callback) {
         } catch (error) {
         }
 
-        var reconfigurator = new Reconfigurator(configuration.copy)
+        var reconfigurator = new Reconfigurator(configuration.copy, require('../json'))
         var contents = JSON.parse(fs.readFileSync(configuration.template, 'utf8'))
         var modified = JSON.parse(JSON.stringify(contents))
 
