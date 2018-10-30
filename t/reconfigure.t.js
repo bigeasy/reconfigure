@@ -7,14 +7,12 @@ function prove (okay, callback) {
     var fs = require('fs')
     var fse = require('fs-extra')
 
-    var Signal = require('signal')
-
-    var cadence = require('cadence')
-    var coalesce = require('extant')
     var Destructible = require('destructible')
     var destructible = new Destructible('t/watcher.t')
 
     destructible.completed.wait(callback)
+
+    var cadence = require('cadence')
 
     cadence(function (async) {
         var configuration = {
@@ -26,26 +24,6 @@ function prove (okay, callback) {
             fs.unlinkSync(configuration.copy)
         } catch (error) {
         }
-
-        var responses = [{
-            value: null,
-            signal: new Signal
-        }, {
-            value: 'x',
-            signal: new Signal
-        }, {
-            value: 'x',
-            signal: new Signal
-        }, {
-            value: JSON.parse(fs.readFileSync(configuration.template, 'utf8')),
-            signal: new Signal
-        }]
-
-        var signals = responses.map(function (response) {
-            return response.signal
-        })
-
-        var signal = responses[0].signal
 
         var reconfigurator = new Reconfigurator(configuration.copy)
         var contents = JSON.parse(fs.readFileSync(configuration.template, 'utf8'))
