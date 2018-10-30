@@ -18,6 +18,7 @@ Reconfigurator.prototype.destroy = function () {
     this._demur.cancel()
     if (this._change != null) {
         this._change.cancel()
+        this._change = null
     }
 }
 
@@ -44,7 +45,21 @@ Reconfigurator.prototype.monitor = cadence(function (async, previous) {
                 watcher.close()
             }], function () {
                 async(function () {
-                    this._change = delta(async()).ee(watcher).on('change')
+                    var change = this._change = delta(async()).ee(watcher).on('change')
+                    async([function () {
+                        async(function () {
+                            fs.readFile(this._path, async())
+                        }, function (current) {
+                            return this._Comparator.call(null, previous, current)
+                        })
+                    }, function (error) {
+                        return true
+                    }], function (dirty) {
+                        if (dirty != null) {
+                            change.cancel()
+                        }
+                        return []
+                    })
                 }, [function () {
                     this._change = null
                 }], function () {
@@ -66,20 +81,6 @@ Reconfigurator.prototype.monitor = cadence(function (async, previous) {
                             return [ loop.break, changed ]
                         }
                     })
-                })
-                async([function () {
-                    async(function () {
-                        fs.readFile(this._path, async())
-                    }, function (current) {
-                        return this._Comparator.call(null, previous, current)
-                    })
-                }, function (error) {
-                    return true
-                }], function (dirty) {
-                    if (dirty != null) {
-                        this._change.cancel()
-                    }
-                    return []
                 })
             })
         }
