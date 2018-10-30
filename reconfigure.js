@@ -6,9 +6,8 @@ var logger = require('prolific.logger').createLogger('prolific.supervisor')
 var coalesce = require('extant')
 var dirty = require('./dirty')
 
-function Reconfigurator (configuration, processor) {
-    this._configuration = configuration
-    this._processor = processor
+function Reconfigurator (path) {
+    this._path = path
     this._change = null
     this._demur = new Demur({ maximum: 60000, immediate: true })
     this.destroyed = false
@@ -32,10 +31,10 @@ Reconfigurator.prototype.monitor = cadence(function (async, contents) {
             return [ loop.break, null ]
         } else {
             try {
-                var watcher = fs.watch(this._configuration)
+                var watcher = fs.watch(this._path)
             } catch (error) {
                 logger.error('watch', {
-                    configuration: this._configuration,
+                    path: this._path,
                     code: coalesce(error.code),
                     stack: error.stack
                 })
@@ -50,10 +49,10 @@ Reconfigurator.prototype.monitor = cadence(function (async, contents) {
                     this._change = null
                 }], function () {
                     async([function () {
-                        dirty(this._configuration, contents, async())
+                        dirty(this._path, contents, async())
                     }, function (error) {
                         logger.error('read', {
-                            configuration: this._configuration,
+                            path: this._path,
                             code: coalesce(error.code),
                             stack: error.stack
                         })
@@ -65,7 +64,7 @@ Reconfigurator.prototype.monitor = cadence(function (async, contents) {
                     })
                 })
                 async([function () {
-                    dirty(this._configuration, contents, async())
+                    dirty(this._path, contents, async())
                 }, function (error) {
                     return true
                 }], function (dirty) {
