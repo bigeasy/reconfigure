@@ -21,7 +21,7 @@
     {
                         "cadence":              "1.0.x",
                         "demur":                "0.2.x",
-                        "destructible":         "0.34.x",
+                        "destructible":         "0.35.x",
                         "prolific.logger":      "8.3.x"
     },
     "devDependencies":
