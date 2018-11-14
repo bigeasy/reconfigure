@@ -26,7 +26,7 @@
     },
     "devDependencies":
     {
-                        "fs-extra":             "7.0.0",
+                        "fs-extra":             "7.0.1",
                         "proof":                "3.0.x"
     },
     "scripts":
