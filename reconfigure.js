@@ -25,11 +25,11 @@ Reconfigurator.prototype.destroy = function () {
 Reconfigurator.prototype.monitor = cadence(function (async, previous) {
     this._demur.reset()
     var start = Date.now()
-    var loop = async(function () {
+    async.loop([], function () {
         this._demur.retry(async())
     }, function () {
         if (this.destroyed) {
-            return [ loop.break, null ]
+            return [ async.break, null ]
         } else {
             try {
                 var watcher = fs.watch(this._path)
@@ -75,16 +75,16 @@ Reconfigurator.prototype.monitor = cadence(function (async, previous) {
                             code: coalesce(error.code),
                             stack: error.stack
                         })
-                        return [ loop.continue ]
+                        return [ async.continue ]
                     }], function (changed) {
                         if (changed != null) {
-                            return [ loop.break, changed ]
+                            return [ async.break, changed ]
                         }
                     })
                 })
             })
         }
-    })()
+    })
 })
 
 module.exports = Reconfigurator
