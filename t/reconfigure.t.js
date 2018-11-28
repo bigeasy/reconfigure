@@ -69,5 +69,5 @@ function prove (okay, callback) {
         }, function (object) {
             okay(object, null, 'object')
         })
-    })(destructible.monitor('test'))
+    })(destructible.durable('test'))
 }
