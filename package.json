@@ -25,7 +25,7 @@
     },
     "devDependencies":
     {
-                        "destructible":         "0.41.x",
+                        "destructible":         "0.42.x",
                         "fs-extra":             "7.0.1",
                         "proof":                "5.0.x"
     },
