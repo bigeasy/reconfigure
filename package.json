@@ -19,7 +19,7 @@
     },
     "dependencies":
     {
-                        "cadence":              "2.0.x",
+                        "cadence":              "3.0.x",
                         "demur":                "0.3.x",
                         "prolific.logger":      "9.0.x"
     },
