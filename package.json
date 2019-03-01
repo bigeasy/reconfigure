@@ -27,7 +27,7 @@
     {
                         "destructible":         "1.0.x",
                         "fs-extra":             "7.0.1",
-                        "proof":                "5.0.x"
+                        "proof":                "7.0.x"
     },
     "scripts":
     {
