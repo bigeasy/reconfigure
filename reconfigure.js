@@ -1,90 +1,79 @@
-var fs = require('fs')
-var cadence = require('cadence')
-var delta = require('delta')
-var Demur = require('demur')
-var logger = require('prolific.logger').createLogger('prolific.supervisor')
-var coalesce = require('extant')
+const fileSystem = require('fs')
+const fs = require('fs').promises
+const path = require('path')
+const events = require('events')
 
-function Reconfigurator (path, Comparator) {
-    this._path = path
-    this._Comparator = Comparator
-    this._change = null
-    this._demur = new Demur({ maximum: 60000, immediate: true })
-    this.destroyed = false
-}
+const Queue = require('avenue')
 
-Reconfigurator.prototype.destroy = function () {
-    this.destroyed = true
-    this._demur.cancel()
-    if (this._change != null) {
-        this._change.cancel()
-        this._change = null
+class Reconfigurator extends events.EventEmitter {
+    constructor (configuration, configurator) {
+        super()
+        this.destroyed = false
+        this._configuration = configuration
+        this._configurator = configurator
+        this._previous = []
+        this._changes = new Queue().shifter().paired
+        const dir = path.dirname(this._configuration)
+        const file = path.basename(this._configuration)
+        this._changes.queue.push('load')
+        this._watcher = fileSystem.watch(dir)
+        this._watcher.on('change', (type, changed) => {
+            if (changed == file) {
+                this._changes.queue.sync.push(type)
+            }
+        })
+        this._watcher.once('close', () => this._changes.queue.sync.push(null))
+    }
+
+    destroy () {
+        if (!this.destroyed) {
+            this.destroyed = true
+            this._watcher.close()
+        }
+    }
+
+    async _shift () {
+        for (;;) {
+            const action = await this._changes.shifter.shift()
+            if (action == null) {
+                return null
+            }
+            switch (action) {
+            case 'load':
+                const method = 'configuration'
+                const buffer = await fs.readFile(this._configuration)
+                const configuration = await this._configurator.load(buffer)
+                this._previous.push(configuration)
+                return configuration
+            case 'rename':
+            case 'change':
+                try {
+                    const method = 'configuration'
+                    const buffer = await fs.readFile(this._configuration)
+                    const previous = this._previous[this._previous.length - 1]
+                    const configuration = await this._configurator.reload(previous, buffer)
+                    if (configuration != null) {
+                        this._previous.push(configuration)
+                        return configuration
+                    }
+                } catch (error) {
+                    this.emit('error', error)
+                }
+            }
+        }
+    }
+
+    [Symbol.asyncIterator]() {
+        return {
+            next: async () => {
+                const value = await this._shift()
+                if (value == null) {
+                    return { done: true }
+                }
+                return { done: false, value }
+            }
+        }
     }
 }
-
-Reconfigurator.prototype.monitor = cadence(function (async, previous) {
-    this._demur.reset()
-    var start = Date.now()
-    async.loop([], function () {
-        this._demur.retry(async())
-    }, function () {
-        if (this.destroyed) {
-            return [ async.break, null ]
-        } else {
-            try {
-                var watcher = fs.watch(this._path)
-            } catch (error) {
-                logger.error('watch', {
-                    path: this._path,
-                    code: coalesce(error.code),
-                    stack: error.stack
-                })
-                return
-            }
-            async([function () {
-                watcher.close()
-            }], function () {
-                async(function () {
-                    var change = this._change = delta(async()).ee(watcher).on('change')
-                    async([function () {
-                        async(function () {
-                            fs.readFile(this._path, async())
-                        }, function (current) {
-                            return this._Comparator.call(null, previous, current)
-                        })
-                    }, function (error) {
-                        return true
-                    }], function (dirty) {
-                        if (dirty != null) {
-                            change.cancel()
-                        }
-                        return []
-                    })
-                }, [function () {
-                    this._change = null
-                }], function () {
-                    async([function () {
-                        async(function () {
-                            fs.readFile(this._path, async())
-                        }, function (current) {
-                            return this._Comparator.call(null, previous, current)
-                        })
-                    }, function (error) {
-                        logger.error('read', {
-                            path: this._path,
-                            code: coalesce(error.code),
-                            stack: error.stack
-                        })
-                        return [ async.continue ]
-                    }], function (changed) {
-                        if (changed != null) {
-                            return [ async.break, changed ]
-                        }
-                    })
-                })
-            })
-        }
-    })
-})
 
 module.exports = Reconfigurator
