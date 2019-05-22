@@ -1,3 +1,10 @@
-module.exports = function (previous, current) {
-    return Buffer.compare(previous, current) != 0 ? current : null
+class BufferConfiguration {
+    load (buffer) {
+        return buffer
+    }
+    compare (previous, buffer) {
+        return Buffer.compare(previous, buffer) != 0 ? buffer : null
+    }
 }
+
+module.exports BufferConfiguration

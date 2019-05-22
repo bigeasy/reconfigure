@@ -1,3 +1,50 @@
+describe('reconfigure', () => {
+    const assert = require('assert')
+    const path = require('path')
+    const callback = require('prospective/callback')
+    const fs = require('fs').promises
+    const Reconfigurator = require('..')
+    const file = path.join(__dirname, 'configuration.json')
+    it('can detect a change', async () => {
+        try {
+            await fs.unlink(file)
+        } catch (error) {
+        }
+        try {
+            await fs.unlink(path.join(__dirname, 'configuration.foo'))
+        } catch (error) {
+        }
+        const reconfigurator = new Reconfigurator(file, require('../json'))
+        reconfigurator.on('error', () => {})
+        const promise = reconfigurator.monitor({ x: 1 })
+        await callback(callback => setTimeout(callback, 150))
+        await fs.writeFile(path.join(__dirname, 'configuration.foo'), '{ "x": 1 }')
+        await callback(callback => setTimeout(callback, 150))
+        await fs.writeFile(file, '{ "x": 1 }')
+        await callback(callback => setTimeout(callback, 150))
+        await fs.writeFile(file, '{ "x": 2 }')
+        const object = await promise
+        assert.deepStrictEqual(object, { x: 2 }, 'changed')
+    })
+    it('can skip a change that does not change content', async () => {
+        try {
+            await fs.unlink(file)
+        } catch (error) {
+        }
+        const reconfigurator = new Reconfigurator(file, require('../json'))
+        reconfigurator.on('error', () => {})
+        const promise = reconfigurator.monitor({ x: 1 })
+        await callback(callback => setTimeout(callback, 50))
+        await fs.writeFile(file, '{ "x": 1 }')
+        await callback(callback => setTimeout(callback, 50))
+        await fs.writeFile(file, '{ "x":   1 }')
+        await callback(callback => setTimeout(callback, 50))
+        reconfigurator.destroy()
+        const object = await promise
+        assert(object == null, 'unchanged')
+    })
+})
+return
 require('proof')(3, prove)
 
 function prove (okay, callback) {

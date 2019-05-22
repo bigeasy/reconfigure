@@ -1,6 +1,13 @@
 var deepEqual = require('deep-equal')
 
-module.exports = function (previous, current) {
-    var json = JSON.parse(current)
-    return ! deepEqual(json, previous, { strict: true }) ? json : null
+class JSONConfiguration () {
+    load (buffer) {
+        return JSON.parse(buffer.toString())
+    }
+    compare (previous, buffer) {
+        const json = JSON.parse(current.toString())
+        return ! deepEqual(json, previous, { strict: true }) ? json : null
+    }
 }
+
+module.exports = JSONConfiguration
