@@ -19,15 +19,15 @@
     },
     "dependencies":
     {
-                        "deep-equal":           "1.0.1",
-                        "demur":                "2.0.x",
-                        "prospective":          "0.0.x"
+                        "avenue":               "0.1.x",
+                        "deep-equal":           "1.0.1"
     },
     "devDependencies":
     {
+                        "prospective":          "0.0.x"
     },
     "scripts":
     {
-                        "test": "proof test test/*.t.js"
+                        "test": "mocha"
     }
 }

@@ -1,13 +1,16 @@
-var deepEqual = require('deep-equal')
+const deepEqual = require('deep-equal')
 
-class JSONConfiguration () {
-    load (buffer) {
-        return JSON.parse(buffer.toString())
+class JSONConfigurator {
+    configure (json) {
+        return json
     }
-    compare (previous, buffer) {
-        const json = JSON.parse(current.toString())
-        return ! deepEqual(json, previous, { strict: true }) ? json : null
+    load (buffer) {
+        return this.configure(JSON.parse(buffer.toString()))
+    }
+    reload (previous, buffer) {
+        const json = JSON.parse(buffer.toString())
+        return ! deepEqual(json, previous, { strict: true }) ? this.configure(json) : null
     }
 }
 
-module.exports = JSONConfiguration
+module.exports = JSONConfigurator

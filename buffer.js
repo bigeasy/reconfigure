@@ -1,10 +1,13 @@
-class BufferConfiguration {
-    load (buffer) {
+class BufferConfigurator {
+    configure (buffer) {
         return buffer
     }
-    compare (previous, buffer) {
-        return Buffer.compare(previous, buffer) != 0 ? buffer : null
+    load (buffer) {
+        return this.configure(buffer)
+    }
+    reload (previous, buffer) {
+        return Buffer.compare(previous, buffer) != 0 ? this.configure(buffer) : null
     }
 }
 
-module.exports BufferConfiguration
+module.exports = BufferConfigurator

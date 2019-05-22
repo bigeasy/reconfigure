@@ -6,85 +6,72 @@ const events = require('events')
 const Queue = require('avenue')
 
 class Reconfigurator extends events.EventEmitter {
-    constructor (path, formatter, validator) {
+    constructor (configuration, configurator) {
         super()
         this.destroyed = false
-        this._path = path
-        this._Comparator = Comparator
-        this._change = null
-        this._watcher = null
+        this._configuration = configuration
+        this._configurator = configurator
+        this._previous = []
         this._changes = new Queue().shifter().paired
-        this._configurations = new Queue().shifter().paired
+        const dir = path.dirname(this._configuration)
+        const file = path.basename(this._configuration)
+        this._changes.queue.push('load')
+        this._watcher = fileSystem.watch(dir)
+        this._watcher.on('change', (type, changed) => {
+            if (changed == file) {
+                this._changes.queue.sync.push(type)
+            }
+        })
+        this._watcher.once('close', () => this._changes.queue.sync.push(null))
     }
 
     destroy () {
         if (!this.destroyed) {
             this.destroyed = true
-            if (this._watcher != null) {
-                this._watcher.close()
-            }
+            this._watcher.close()
         }
     }
 
-    async _changed (entry) {
-        if (entry == null) {
-            this._configurations.queue.push(null)
-        } else {
-            switch (entry.name) {
+    async _shift () {
+        for (;;) {
+            const action = await this._changes.shifter.shift()
+            if (action == null) {
+                return null
+            }
+            switch (action) {
             case 'load':
-                try {
-                    const method = 'configuration'
-                    const buffer = await fs.readFile(this._path)
-                    const formatted = this._format.load(buffer)
-                    const configuration = await this._validator.call(null, formatted)
-                    this._previous.push(configuration)
-                    this._configurations.queue.enqueue([{ method, configuration ]})
-                } catch (error) {
-                    const method = 'error'
-                    await this._configurations.queue.enqueue([{ method, error }])
-                }
-                break
+                const method = 'configuration'
+                const buffer = await fs.readFile(this._configuration)
+                const configuration = await this._configurator.load(buffer)
+                this._previous.push(configuration)
+                return configuration
             case 'rename':
             case 'change':
                 try {
                     const method = 'configuration'
-                    const buffer = await fs.readFile(this._path)
+                    const buffer = await fs.readFile(this._configuration)
                     const previous = this._previous[this._previous.length - 1]
-                    const formatted = this._format.compare(previous, buffer)
-                    if (formatted != null) {
-                        const configuration = await this._validator.call(null, formatted)
+                    const configuration = await this._configurator.reload(previous, buffer)
+                    if (configuration != null) {
                         this._previous.push(configuration)
-                        this._configurations.queue.enqueue([{ method, configuration ]})
+                        return configuration
                     }
                 } catch (error) {
                     this.emit('error', error)
                 }
-                break
             }
         }
     }
 
-    async monitor () {
-        const dir = path.dirname(this._path)
-        const file = path.basename(this._path)
-        this._changes.queue.push({ type: 'load' })
-        this._watcher = fileSystem.watch(this._dir)
-        this._watcher.on('change', (type, file) => {
-            if (file == this._file) {
-                this._changes.queue.push(type)
+    [Symbol.asyncIterator]() {
+        return {
+            next: async () => {
+                const value = await this._shift()
+                if (value == null) {
+                    return { done: true }
+                }
+                return { done: false, value }
             }
-        })
-        this._watcher.once('close', () => this._changes.queue.push(null))
-        return this._changes.shifter().pump(this._changed.bind(this))
-    }
-
-    async configuration () {
-        const entry = this._shifter.shift()
-        switch (entry.method) {
-        case 'error':
-            throw entry.error
-        case 'configuration':
-            return entry.configuration
         }
     }
 }

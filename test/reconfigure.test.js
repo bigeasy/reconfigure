@@ -6,6 +6,8 @@ describe('reconfigure', () => {
     const Reconfigurator = require('..')
     const file = path.join(__dirname, 'configuration.json')
     it('can detect a change', async () => {
+        const Configurator = require('../json')
+        const test = []
         try {
             await fs.unlink(file)
         } catch (error) {
@@ -14,107 +16,25 @@ describe('reconfigure', () => {
             await fs.unlink(path.join(__dirname, 'configuration.foo'))
         } catch (error) {
         }
-        const reconfigurator = new Reconfigurator(file, require('../json'))
-        reconfigurator.on('error', () => {})
-        const promise = reconfigurator.monitor({ x: 1 })
-        await callback(callback => setTimeout(callback, 150))
+        await fs.writeFile(file, '{ "x": 1 }')
+        const reconfigurator = new Reconfigurator(file, new Configurator)
+        reconfigurator.on('error', error => test.push('error'))
+        const loop = (async () => {
+            for await (let configuration of reconfigurator) {
+                test.push(configuration)
+            }
+        })()
+        await callback(callback => setTimeout(callback, 50))
         await fs.writeFile(path.join(__dirname, 'configuration.foo'), '{ "x": 1 }')
-        await callback(callback => setTimeout(callback, 150))
+        await callback(callback => setTimeout(callback, 50))
         await fs.writeFile(file, '{ "x": 1 }')
-        await callback(callback => setTimeout(callback, 150))
+        await callback(callback => setTimeout(callback, 50))
+        await fs.writeFile(file, '{ "x": ')
+        await callback(callback => setTimeout(callback, 50))
         await fs.writeFile(file, '{ "x": 2 }')
-        const object = await promise
-        assert.deepStrictEqual(object, { x: 2 }, 'changed')
-    })
-    it('can skip a change that does not change content', async () => {
-        try {
-            await fs.unlink(file)
-        } catch (error) {
-        }
-        const reconfigurator = new Reconfigurator(file, require('../json'))
-        reconfigurator.on('error', () => {})
-        const promise = reconfigurator.monitor({ x: 1 })
-        await callback(callback => setTimeout(callback, 50))
-        await fs.writeFile(file, '{ "x": 1 }')
-        await callback(callback => setTimeout(callback, 50))
-        await fs.writeFile(file, '{ "x":   1 }')
         await callback(callback => setTimeout(callback, 50))
         reconfigurator.destroy()
-        const object = await promise
-        assert(object == null, 'unchanged')
+        reconfigurator.destroy()
+        assert.deepStrictEqual(test, [ { x: 1 }, 'error', { x: 2 } ], 'reconfigure')
     })
 })
-return
-require('proof')(3, prove)
-
-function prove (okay, callback) {
-    var Reconfigurator = require('../reconfigure')
-
-    var path = require('path')
-    var fs = require('fs')
-    var fse = require('fs-extra')
-
-    var Destructible = require('destructible')
-    var destructible = new Destructible('t/watcher.t')
-
-    destructible.completed.wait(callback)
-
-    var cadence = require('cadence')
-
-    cadence(function (async) {
-        var configuration = {
-            template: path.join(__dirname, 'configuration.json'),
-            copy: path.join(__dirname, 'configuration.copy.json')
-        }
-
-        try {
-            fs.unlinkSync(configuration.copy)
-        } catch (error) {
-        }
-
-        var reconfigurator = new Reconfigurator(configuration.copy, require('../json'))
-        var contents = JSON.parse(fs.readFileSync(configuration.template, 'utf8'))
-        var modified = JSON.parse(JSON.stringify(contents))
-
-        async(function () {
-            reconfigurator.monitor(contents, async())
-            setTimeout(function () {
-                fse.copySync(configuration.template, configuration.copy)
-                setTimeout(function () {
-                    modified.x = 2
-                    fs.writeFileSync(configuration.copy, JSON.stringify(modified), 'utf8')
-                }, 250)
-            }, 250)
-        }, function (object) {
-            okay(object, {
-                accept: false,
-                chain: [{ path: '.', level: 'warn', accept: true }],
-                pipeline: [{ module: 'prolific.test' }],
-                x: 2
-            }, 'changed')
-            fs.writeFileSync(configuration.copy, '{', 'utf8')
-            reconfigurator.monitor(JSON.parse(JSON.stringify(modified)), async())
-            setTimeout(function () {
-                modified.x = 1
-                fs.writeFileSync(configuration.copy, JSON.stringify(modified), 'utf8')
-            }, 250)
-        }, function (object) {
-            okay(object, {
-                accept: false,
-                chain: [{ path: '.', level: 'warn', accept: true }],
-                pipeline: [{ module: 'prolific.test' }],
-                x: 1
-            }, 'changed back')
-            reconfigurator.monitor(JSON.parse(JSON.stringify(modified)), async())
-            setTimeout(function () {
-                fs.writeFileSync(configuration.copy, JSON.stringify(modified), 'utf8')
-                setTimeout(function () {
-                    reconfigurator.destroy()
-                    reconfigurator.destroy()
-                })
-            }, 250)
-        }, function (object) {
-            okay(object, null, 'object')
-        })
-    })(destructible.durable('test'))
-}
