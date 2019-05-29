@@ -30,12 +30,16 @@ describe('reconfigure', () => {
         await callback(callback => setTimeout(callback, 50))
         await fs.writeFile(file, '{ "x": 1 }')
         await callback(callback => setTimeout(callback, 50))
+        assert.deepStrictEqual(test.splice(0), [{ x: 1 }], 'load')
         await fs.writeFile(file, '{ "x": ')
         await callback(callback => setTimeout(callback, 50))
+        // OS X generates one error, Linux two, so let's see that we get at
+        // least one.
+        assert.deepStrictEqual(test.splice(0)[0], 'error', 'error')
         await fs.writeFile(file, '{ "x": 2 }')
         await callback(callback => setTimeout(callback, 50))
         reconfigurator.destroy()
         reconfigurator.destroy()
-        assert.deepStrictEqual(test, [ { x: 1 }, 'error', { x: 2 } ], 'reconfigure')
+        assert.deepStrictEqual(test.splice(0), [{ x: 2 }], 'reconfigure')
     })
 })
