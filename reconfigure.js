@@ -35,7 +35,6 @@ class Reconfigurator extends events.EventEmitter {
     async _shift () {
         for (;;) {
             const action = await this._changes.shifter.shift()
-            console.log(action)
             if (action == null) {
                 return null
             }
@@ -58,7 +57,6 @@ class Reconfigurator extends events.EventEmitter {
                         return configuration
                     }
                 } catch (error) {
-                    console.log(error.stack)
                     this.emit('error', error)
                 }
             }
