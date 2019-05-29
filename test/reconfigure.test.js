@@ -19,6 +19,7 @@ describe('reconfigure', () => {
         await fs.writeFile(file, '{ "x": 1 }')
         const reconfigurator = new Reconfigurator(file, new Configurator)
         reconfigurator.on('error', error => test.push('error'))
+        reconfigurator.on('error', error => console.log('YES GOT ERROR'))
         const loop = (async () => {
             for await (let configuration of reconfigurator) {
                 test.push(configuration)
@@ -30,7 +31,7 @@ describe('reconfigure', () => {
         await fs.writeFile(file, '{ "x": 1 }')
         await callback(callback => setTimeout(callback, 50))
         await fs.writeFile(file, '{ "x": ')
-        await callback(callback => setTimeout(callback, 150))
+        await callback(callback => setTimeout(callback, 50))
         await fs.writeFile(file, '{ "x": 2 }')
         await callback(callback => setTimeout(callback, 50))
         reconfigurator.destroy()
