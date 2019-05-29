@@ -30,7 +30,7 @@ describe('reconfigure', () => {
         await fs.writeFile(file, '{ "x": 1 }')
         await callback(callback => setTimeout(callback, 50))
         await fs.writeFile(file, '{ "x": ')
-        await callback(callback => setTimeout(callback, 50))
+        await callback(callback => setTimeout(callback, 150))
         await fs.writeFile(file, '{ "x": 2 }')
         await callback(callback => setTimeout(callback, 50))
         reconfigurator.destroy()
