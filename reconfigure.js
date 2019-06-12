@@ -32,7 +32,7 @@ class Reconfigurator extends events.EventEmitter {
         }
     }
 
-    async _shift () {
+    async shift () {
         for (;;) {
             const action = await this._changes.shifter.shift()
             if (action == null) {
@@ -66,7 +66,7 @@ class Reconfigurator extends events.EventEmitter {
     [Symbol.asyncIterator]() {
         return {
             next: async () => {
-                const value = await this._shift()
+                const value = await this.shift()
                 if (value == null) {
                     return { done: true }
                 }
