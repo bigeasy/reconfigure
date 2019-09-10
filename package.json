@@ -1,6 +1,6 @@
 {
     "name":             "reconfigure",
-    "version":          "3.0.0-alpha.0",
+    "version":          "3.0.0-alpha.1",
     "author":           "Alan Gutierrez <alan@prettyrobots.com>",
     "description":      "File system watching configuration.",
     "keywords":
