@@ -24,7 +24,7 @@
     },
     "devDependencies":
     {
-                        "prospective":          "0.0.x"
+                        "prospective":          "^0.1.0-alpha.1"
     },
     "scripts":
     {
