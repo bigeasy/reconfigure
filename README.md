@@ -1,16 +1,19 @@
-# Reconfigure
+[![Actions Status](https://github.com/bigeasy/reconfigure/workflows/Node%20CI/badge.svg)](https://github.com/bigeasy/reconfigure/actions)
+[![codecov](https://codecov.io/gh/bigeasy/reconfigure/branch/master/graph/badge.svg)](https://codecov.io/gh/bigeasy/reconfigure)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A reconfiguration service for CoreOS applications.
+A comparator function builder.
 
-`bash etcd/etcd.sh` starts etcd locally.
+| What          | Where                                             |
+| --- | --- |
+| Discussion    | https://github.com/bigeasy/reconfigure/issues/1   |
+| Documentation | https://bigeasy.github.io/reconfigure             |
+| Source        | https://github.com/bigeasy/reconfigure            |
+| Issues        | https://github.com/bigeasy/reconfigure/issues     |
+| CI            | https://travis-ci.org/bigeasy/reconfigure         |
+| Coverage:     | https://codecov.io/gh/bigeasy/reconfigure         |
 
-`reconfigure serve --port=8080 --etcdaddr=172.your.IP.10:2379` starts an HTTP
-server and Reconfigure.
 
-`reconfigure register 127.0.0.1:8080 http://54.10.58.4:2333/some-endpoint` registers
-the url `http://54.10.58.4:2333/some-endpoint` for updates. `reconfigure deregister`
-is similar. `reconfigure registered` returns registered endpoints.
-
-`reconfigure set 127.0.0.1:8080 key value` sets an etcd `key` to `value`.
-
-`reconfigure list 127.0.0.1:8080` lists current keys and values.
+```
+npm install reconfigure
+```
