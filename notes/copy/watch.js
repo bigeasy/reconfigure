@@ -4,10 +4,13 @@ const file = path.resolve(__dirname, 'conf.js')
 const dir = path.dirname(file)
 const watcher = fs.watch(dir)
 
+let last = 0
 watcher.on('change', (eventType, filename) => {
     console.log(eventType, filename)
     try {
-        console.log(fs.statSync(path.resolve(__dirname, filename)))
+        const now = Date.now()
+        console.log(now - last, fs.statSync(path.resolve(__dirname, filename)))
+        last = now
     } catch (error) {
         if (error.code != 'ENOENT') {
             throw error
