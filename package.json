@@ -1,34 +1,37 @@
 {
-    "name":             "reconfigure",
-    "version":          "3.0.0-alpha.1",
-    "author":           "Alan Gutierrez <alan@prettyrobots.com>",
-    "description":      "File system watching configuration.",
+    "name":                 "reconfigure",
+    "version":              "3.0.0-alpha.1",
+    "description":
+
+      "File system watching configuration.",
+
     "keywords":
     [
-                        "configuration"
+                            "configuration"
     ],
-    "contributors":     [],
-    "homepage":         "https://github.com/bigeasy/reconfigure",
-    "bugs":             "https://github.com/bigeasy/reconfigure/issues",
-    "license":          "MIT",
-    "main":             "reconfigure",
+    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
+    "contributors":         [],
+    "homepage":             "https://github.com/bigeasy/reconfigure",
+    "bugs":                 "https://github.com/bigeasy/reconfigure/issues",
+    "license":              "MIT",
     "repository":
     {
-                        "type": "git",
-                        "url": "bigeasy/reconfigure"
+                            "type": "git",
+                            "url": "bigeasy/reconfigure"
     },
     "dependencies":
     {
-                        "avenue":               "^0.2.0-alpha.0",
-                        "deep-equal":           "1.1.0"
+                            "avenue":                       "^0.2.0-alpha.0",
+                            "deep-equal":                   "1.1.0"
     },
     "devDependencies":
     {
-                        "proof":                "^8.0.0-alpha.7",
-                        "prospective":          "^0.1.0-alpha.1"
+                            "proof":                        "^8.0.0-alpha.7",
+                            "prospective":                  "^0.1.0-alpha.1"
     },
+    "main":                 "reconfigure",
     "scripts":
     {
-                        "test": "proof test/*.t.js"
+                            "test": "proof test/*.t.js"
     }
 }
