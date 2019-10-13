@@ -1,8 +1,7 @@
+/.dots
+/.nyc_output
 /.wiseguy
+/coverage
 /docs
 /node_modules
-/.proof.out
-/coverage
-/.nyc_output
-/t/configuration.copy.json
-/notes/copy/*.txt
+/test/configuration.*
