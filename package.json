@@ -21,7 +21,7 @@
     },
     "dependencies":
     {
-                            "avenue":                       "^0.2.0-alpha.0",
+                            "avenue":                       "^0.3.0",
                             "fast-deep-equal":              "2.0.1"
     },
     "devDependencies":
