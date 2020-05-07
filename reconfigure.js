@@ -11,14 +11,14 @@ class Reconfigurator extends events.EventEmitter {
         this._configuration = configuration
         this._configurator = configurator
         this._previous = []
-        this._changes = [ 'load' ]
+        this._changes = [{ method: 'load' }]
         this._notify = noop
         const dir = path.dirname(this._configuration)
         const file = path.basename(this._configuration)
         this._watcher = fileSystem.watch(dir)
-        this._watcher.on('change', (type, changed) => {
+        this._watcher.on('change', (method, changed) => {
             if (changed == file) {
-                this._push(type)
+                this._push({ method })
             }
         })
         this._watcher.once('close', () => {
@@ -39,6 +39,19 @@ class Reconfigurator extends events.EventEmitter {
         this._notify.call()
     }
 
+    unshift (buffer) {
+        this._push({ method: 'unshift', buffer })
+    }
+
+    async _reconfigure (buffer, force) {
+        const previous = this._previous[this._previous.length - 1]
+        const configuration = await this._configurator.reload(previous, buffer, force)
+        if (configuration != null) {
+            this._previous.push(configuration)
+            return configuration
+        }
+    }
+
     async shift () {
         for (;;) {
             if (this.destroyed) {
@@ -49,27 +62,35 @@ class Reconfigurator extends events.EventEmitter {
                 continue
             }
             const action = this._changes.shift()
-            console.log(action)
-            switch (action) {
-            case 'load':
+            if (action.method == 'load') {
                 const method = 'configuration'
                 const buffer = await fs.readFile(this._configuration)
-                const configuration = await this._configurator.load(buffer)
-                this._previous.push(configuration)
-                return configuration
-            case 'rename':
-            case 'change':
+                const body = await this._configurator.load(buffer)
+                this._previous.push(body)
+                return { method: 'configure', body }
+            } else {
                 try {
-                    const method = 'configuration'
-                    const buffer = await fs.readFile(this._configuration)
-                    const previous = this._previous[this._previous.length - 1]
-                    const configuration = await this._configurator.reload(previous, buffer)
-                    if (configuration != null) {
-                        this._previous.push(configuration)
-                        return configuration
+                    switch (action.method) {
+                    case 'unshift': {
+                            return {
+                                method: 'configure',
+                                body: await this._reconfigure(action.buffer, true)
+                            }
+                        }
+                    case 'rename':
+                    case 'change': {
+                            const body = await this._reconfigure(await fs.readFile(this._configuration), false)
+                            if (body != null) {
+                                return { method: 'configure', body }
+                            }
+                        }
+                        break
                     }
                 } catch (error) {
-                    this.emit('error', error)
+                    return {
+                        method: 'error',
+                        body: error
+                    }
                 }
             }
         }

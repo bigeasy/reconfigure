@@ -7,9 +7,9 @@ class JSONConfigurator {
     load (buffer) {
         return this.configure(JSON.parse(buffer.toString()))
     }
-    reload (previous, buffer) {
+    reload (previous, buffer, force) {
         const json = JSON.parse(buffer.toString())
-        return ! deepEqual(json, previous, { strict: true }) ? this.configure(json) : null
+        return force || ! deepEqual(json, previous, { strict: true }) ? this.configure(json) : null
     }
 }
 

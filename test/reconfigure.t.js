@@ -1,4 +1,4 @@
-require('proof')(3, async (okay) => {
+require('proof')(4, async (okay) => {
     const path = require('path')
     const callback = require('prospective/callback')
     const fs = require('fs').promises
@@ -16,7 +16,6 @@ require('proof')(3, async (okay) => {
     }
     await fs.writeFile(file, '{ "x": 1 }')
     const reconfigurator = new Reconfigurator(file, new Configurator)
-    reconfigurator.on('error', error => test.push('error'))
     const loop = (async () => {
         for await (let configuration of reconfigurator) {
             test.push(configuration)
@@ -27,15 +26,18 @@ require('proof')(3, async (okay) => {
     await callback(callback => setTimeout(callback, 100))
     await fs.writeFile(file, '{ "x": 1 }')
     await callback(callback => setTimeout(callback, 100))
-    okay(test.splice(0), [{ x: 1 }], 'load')
+    okay(test.splice(0), [{ method: 'configure', body: { x: 1 } }], 'load')
     await fs.writeFile(file, '{ "x": ')
     await callback(callback => setTimeout(callback, 100))
     // OS X generates one error, Linux two, so let's see that we get at
     // least one.
-    okay(test.splice(0)[0], 'error', 'error')
+    okay(test.splice(0)[0].body.constructor.name, 'SyntaxError', 'error')
     await fs.writeFile(file, '{ "x": 2 }')
+    await callback(callback => setTimeout(callback, 100))
+    reconfigurator.unshift(Buffer.from(JSON.stringify({ x: 2 })))
+    okay(test.splice(0), [{ method: 'configure', body: { x: 2 } }], 'reconfigure')
     await callback(callback => setTimeout(callback, 100))
     reconfigurator.destroy()
     reconfigurator.destroy()
-    okay(test.splice(0), [{ x: 2 }], 'reconfigure')
+    okay(test.splice(0), [{ method: 'configure', body: { x: 2 } }], 'unshift')
 })

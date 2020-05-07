@@ -5,8 +5,8 @@ class BufferConfigurator {
     load (buffer) {
         return this.configure(buffer)
     }
-    reload (previous, buffer) {
-        return Buffer.compare(previous, buffer) != 0 ? this.configure(buffer) : null
+    reload (previous, buffer, force) {
+        return force || Buffer.compare(previous, buffer) != 0 ? this.configure(buffer) : null
     }
 }
 
