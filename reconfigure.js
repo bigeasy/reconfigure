@@ -3,8 +3,6 @@ const fs = require('fs').promises
 const path = require('path')
 const events = require('events')
 
-const Queue = require('avenue')
-
 class Reconfigurator extends events.EventEmitter {
     constructor (configuration, configurator) {
         super()
@@ -12,17 +10,20 @@ class Reconfigurator extends events.EventEmitter {
         this._configuration = configuration
         this._configurator = configurator
         this._previous = []
-        this._changes = new Queue().shifter().paired
+        this._changes = [ 'load' ]
+        this._notify = () => {}
         const dir = path.dirname(this._configuration)
         const file = path.basename(this._configuration)
-        this._changes.queue.push('load')
         this._watcher = fileSystem.watch(dir)
         this._watcher.on('change', (type, changed) => {
             if (changed == file) {
-                this._changes.queue.sync.push(type)
+                this._push(type)
             }
         })
-        this._watcher.once('close', () => this._changes.queue.sync.push(null))
+        this._watcher.once('close', () => {
+            this.destroyed = true
+            this._notify.call()
+        })
     }
 
     destroy () {
@@ -32,12 +33,22 @@ class Reconfigurator extends events.EventEmitter {
         }
     }
 
+    _push (action) {
+        this._changes.push(action)
+        this._notify.call()
+    }
+
     async shift () {
         for (;;) {
-            const action = await this._changes.shifter.shift()
-            if (action == null) {
+            if (this.destroyed) {
                 return null
             }
+            if (this._changes.length == 0) {
+                await new Promise(resolve => this._notify = resolve)
+                continue
+            }
+            const action = this._changes.shift()
+            console.log(action)
             switch (action) {
             case 'load':
                 const method = 'configuration'
