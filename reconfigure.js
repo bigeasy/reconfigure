@@ -2,6 +2,7 @@ const fileSystem = require('fs')
 const fs = require('fs').promises
 const path = require('path')
 const events = require('events')
+const noop = require('nop')
 
 class Reconfigurator extends events.EventEmitter {
     constructor (configuration, configurator) {
@@ -11,7 +12,7 @@ class Reconfigurator extends events.EventEmitter {
         this._configurator = configurator
         this._previous = []
         this._changes = [ 'load' ]
-        this._notify = () => {}
+        this._notify = noop
         const dir = path.dirname(this._configuration)
         const file = path.basename(this._configuration)
         this._watcher = fileSystem.watch(dir)
