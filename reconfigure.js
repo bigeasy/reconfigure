@@ -5,6 +5,16 @@ const events = require('events')
 const noop = require('nop')
 
 class Reconfigurator extends events.EventEmitter {
+    // We do not want any sort of race condition, so we start watching before we
+    // load the initial file. If we start watching after the initial file is
+    // loaded there is a window where the file may change from the original load
+    // undetected.
+
+    // Note that the watcher only tells us that there is a change which makes us
+    // reload, so the file we load may itself be stale, but eventually we'll get
+    // to the latest version of the file on disk, which is all that matters.
+
+    //
     constructor (configuration, configurator) {
         super()
         this.destroyed = false
@@ -63,11 +73,16 @@ class Reconfigurator extends events.EventEmitter {
             }
             const action = this._changes.shift()
             if (action.method == 'load') {
-                const method = 'configuration'
-                const buffer = await fs.readFile(this._configuration)
-                const body = await this._configurator.load(buffer)
-                this._previous.push(body)
-                return { method: 'configure', body }
+                try {
+                    const method = 'configuration'
+                    const buffer = await fs.readFile(this._configuration)
+                    const body = await this._configurator.load(buffer)
+                    this._previous.push(body)
+                    return { method: 'configure', body }
+                } catch (error) {
+                    this.destroy()
+                    throw error
+                }
             } else {
                 try {
                     switch (action.method) {
