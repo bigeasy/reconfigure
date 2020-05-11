@@ -3,8 +3,10 @@ const fs = require('fs').promises
 const path = require('path')
 const events = require('events')
 const noop = require('nop')
+const Interrupt = require('interrupt')
 
 class Reconfigurator extends events.EventEmitter {
+    static Error = Interrupt.create('Reconfigure.Error')
     // We do not want any sort of race condition, so we start watching before we
     // load the initial file. If we start watching after the initial file is
     // loaded there is a window where the file may change from the original load
@@ -54,11 +56,15 @@ class Reconfigurator extends events.EventEmitter {
     }
 
     async _reconfigure (buffer, force) {
-        const previous = this._previous[this._previous.length - 1]
-        const configuration = await this._configurator.reload(previous, buffer, force)
-        if (configuration != null) {
-            this._previous.push(configuration)
-            return configuration
+        try {
+            const previous = this._previous[this._previous.length - 1]
+            const configuration = await this._configurator.reload(previous, buffer, force)
+            if (configuration != null) {
+                this._previous.push(configuration)
+                return configuration
+            }
+        } catch (error) {
+            throw new Reconfigurator.Error('configure', error, {}, { buffer })
         }
     }
 
