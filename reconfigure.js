@@ -42,7 +42,7 @@ class Reconfigurator extends events.EventEmitter {
     destroy () {
         if (!this.destroyed) {
             this.destroyed = true
-            this._watcher.close()
+            this._push(null)
         }
     }
 
@@ -70,14 +70,14 @@ class Reconfigurator extends events.EventEmitter {
 
     async shift () {
         for (;;) {
-            if (this.destroyed) {
-                return null
-            }
             if (this._changes.length == 0) {
                 await new Promise(resolve => this._notify = resolve)
-                continue
             }
             const action = this._changes.shift()
+            if (action == null) {
+                this._watcher.close()
+                return null
+            }
             if (action.method == 'load') {
                 try {
                     const method = 'configuration'
@@ -86,7 +86,8 @@ class Reconfigurator extends events.EventEmitter {
                     this._previous.push(body)
                     return { method: 'configure', body }
                 } catch (error) {
-                    this.destroy()
+                    this.destroyed = true
+                    this._watcher.close()
                     throw error
                 }
             } else {
