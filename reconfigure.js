@@ -118,15 +118,13 @@ class Reconfigurator extends events.EventEmitter {
         }
     }
 
-    [Symbol.asyncIterator]() {
-        return {
-            next: async () => {
-                const value = await this.shift()
-                if (value == null) {
-                    return { done: true }
-                }
-                return { done: false, value }
+    async *[Symbol.asyncIterator]() {
+        for (;;) {
+            const value = await this.shift()
+            if (value == null) {
+                break
             }
+            yield value
         }
     }
 }
