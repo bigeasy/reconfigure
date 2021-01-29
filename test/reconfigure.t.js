@@ -40,7 +40,7 @@ require('proof')(5, async (okay) => {
         await new Promise(resolve => setTimeout(resolve, 100))
         // OS X generates one error, Linux two, so let's see that we get at
         // least one.
-        okay(test.splice(0)[0].body.causes[0] instanceof SyntaxError, 'error')
+        okay(test.splice(0)[0].body.errors[0] instanceof SyntaxError, 'error')
         await fs.writeFile(file, '{ "x": 2 }')
         await new Promise(resolve => setTimeout(resolve, 100))
         reconfigurator.unshift(Buffer.from(JSON.stringify({ x: 2 })))

@@ -6,7 +6,9 @@ const noop = require('nop')
 const Interrupt = require('interrupt')
 
 class Reconfigurator extends events.EventEmitter {
-    static Error = Interrupt.create('Reconfigure.Error')
+    static Error = Interrupt.create('Reconfigure.Error', {
+        CONFIGURE: 'configuration error'
+    })
     // We do not want any sort of race condition, so we start watching before we
     // load the initial file. If we start watching after the initial file is
     // loaded there is a window where the file may change from the original load
@@ -64,7 +66,7 @@ class Reconfigurator extends events.EventEmitter {
                 return configuration
             }
         } catch (error) {
-            throw new Reconfigurator.Error('configure', error, {}, { buffer })
+            throw new Reconfigurator.Error('CONFIGURE', error, {}, { buffer })
         }
     }
 
