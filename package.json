@@ -27,8 +27,7 @@
     },
     "devDependencies":
     {
-                            "proof":                        "^9.0.1",
-                            "prospective":                  "^0.2.0"
+                            "proof":                        "^9.0.1"
     },
     "main":                 "reconfigure",
     "scripts":
