@@ -4,7 +4,7 @@ const path = require('path')
 const events = require('events')
 const noop = require('nop')
 
-const { Interrupt } = require('interrupt')
+const Interrupt = require('interrupt')
 
 class Reconfigurator extends events.EventEmitter {
     static Error = Interrupt.create('Reconfigure.Error', {
